@@ -14,7 +14,7 @@
 #include "G4Box.hh"
 #include "G4GeneralParticleSource.hh"
 
-#include <string>
+#include "GeometryManager.hh"
 
 #include "RunAction.hh"
 
@@ -32,13 +32,13 @@ class GeneratorAction : public G4VUserPrimaryGeneratorAction {
 
 public:
 
-    GeneratorAction( RunAction* runAction);
+    GeneratorAction( RunAction* runAction, GeometryManager* geoManager);
 
     virtual ~GeneratorAction();
 
     virtual void GeneratePrimaries(G4Event* event);
 
-    void SetSpectrum( string str );
+    void SetSpectrum( G4String str );
         // used to specify the gamma spectrum from which to sample energy & momentum
 
     void Sample( int n = -1 );
@@ -61,9 +61,13 @@ private:
     GeneratorMessenger* primaryGeneratorMessenger;
 
     RunAction* fRunAction;
+
     CommandlineArguments* fCmdlArgs;
 
+    GeometryManager* fGeometryManager;
+
     G4ParticleGun*  fgun;
+
     G4GeneralParticleSource*  fgps;
 
     bool use_gps;

@@ -29,8 +29,8 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 
-GeometryConstruction::GeometryConstruction( RunAction* ra, GeometryManager* gm) : G4VUserDetectorConstruction(),
-    fRunAction( ra ), 
+GeometryConstruction::GeometryConstruction( /*RunAction* ra,*/ GeometryManager* gm) : G4VUserDetectorConstruction(),
+//    fRunAction( ra ), 
     fGeometryManager( gm ) {
 
     fCheckOverlaps = true;

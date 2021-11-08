@@ -28,7 +28,7 @@ class GeometryConstruction : public G4VUserDetectorConstruction{
 
 public:
 
-    GeometryConstruction( RunAction* ra, GeometryManager* man );
+    GeometryConstruction( /*RunAction* ra,*/ GeometryManager* man );
 
     virtual ~GeometryConstruction();
 
@@ -46,7 +46,7 @@ public:
 
 private:
 
-    RunAction* fRunAction;
+    //RunAction* fRunAction;
     GeometryConstructionMessenger* fDetectorMessenger;
     GeometryManager* fGeometryManager;
     

@@ -70,11 +70,11 @@ void GeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
     else if( command == cmdSetDir ){
         primaryGenerator->SetDirection();
     }
-
+    /*
     else if( command == cmdSetWall ){
         primaryGenerator->ConfineOnWall();
     }
-
+    */
     else if( command == cmdSetEnergy ){
         primaryGenerator->SetEnergy();
     }

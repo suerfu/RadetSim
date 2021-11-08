@@ -37,7 +37,7 @@ G4NistManager* GeometryManager::GetMaterialManager(){
 }
 
 G4Material* GeometryManager::GetMaterial(G4String name){
-    material_man->FindOrBuildMaterial( name );
+    return material_man->FindOrBuildMaterial( name );
 }
 
 

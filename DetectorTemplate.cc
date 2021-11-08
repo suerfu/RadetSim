@@ -84,19 +84,12 @@ int main(int argc,char** argv){
 
 
     G4RunManager * runManager = new G4RunManager();
-    
-    // Run action
-    //
-    RunAction* runAction = new RunAction( &cmdl );
-    //runAction->SetOutputFileName( filename );
-    //runAction->AddRandomSeeds( seeds, 2);
-    runManager->SetUserAction( runAction );
 
 
     // Construct detector geometry
     //
     GeometryManager* geometryManager = new GeometryManager();
-    GeometryConstruction* detectorConstruction = new GeometryConstruction( runAction, geometryManager );
+    GeometryConstruction* detectorConstruction = new GeometryConstruction( geometryManager );
     runManager->SetUserInitialization( detectorConstruction );
 
 
@@ -115,9 +108,17 @@ int main(int argc,char** argv){
     runManager->SetUserInitialization( physicsList );
 
 
+    // Run action
+    //
+    RunAction* runAction = new RunAction( &cmdl );
+    //runAction->SetOutputFileName( filename );
+    //runAction->AddRandomSeeds( seeds, 2);
+    runManager->SetUserAction( runAction );
+
+
     // Primary generator
     //
-    GeneratorAction* generatorAction = new GeneratorAction( runAction );
+    GeneratorAction* generatorAction = new GeneratorAction( runAction, geometryManager );
     runManager->SetUserAction( generatorAction );
 
 
