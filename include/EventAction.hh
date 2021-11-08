@@ -12,11 +12,28 @@
 #include "StepInfo.hh"
 #include "RunAction.hh"
 
+struct KineticInfo{
+
+    double rx;
+    double ry;
+    double rz;
+
+    double px;
+    double py;
+    double pz;
+
+    double Eki;
+    double Ekf;
+    double Edep;
+    
+    double time;
+};
+
 class EventAction : public G4UserEventAction{
 
 public:
 
-    EventAction( RunAction* input_run_action );
+    EventAction( RunAction* runaction );
     virtual ~EventAction();
 
     virtual void BeginOfEventAction(const G4Event* event);
@@ -28,7 +45,7 @@ public:
 
 private:
     
-    RunAction* run_action;
+    RunAction* fRunAction;
 
     CommandlineArguments* cmdl;
 
@@ -38,39 +55,23 @@ private:
 
     int eventID;
     int trackID;
-    int stepID;
     int parentID;
+    int stepID;
 
     int max_char_len;
-    char particle_name[16];
-    char volume_name[16];
-    char process_name[16];
+    char particleName[16];
+    char volumeName[16];
+    char processName[16];
 
-    G4String tmp_particle_name;
-    G4String tmp_volume_name;
-    G4String tmp_process_name;
+    G4String tmp_particleName;
+    G4String tmp_volumeName;
+    G4String tmp_processName;
     
     G4ThreeVector position;
-    double x;
-    double y;
-    double z;
-    double r;
-    double rphi;
-
     G4ThreeVector momentum;
-    double px;
-    double py;
-    double pz;
-    double theta;
-    double phi;
 
-    double Eki;
-    double Ekf;
-    double edep;
-    
-    double global_time;
+    KineticInfo kineticInfo;
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

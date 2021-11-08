@@ -19,14 +19,13 @@ SteppingAction::SteppingAction( RunAction* runAction, EventAction* eventAction, 
 }
 
 
-SteppingAction::~SteppingAction(){
-}
+SteppingAction::~SteppingAction(){ }
 
 
 void SteppingAction::UserSteppingAction( const G4Step* step){
     
+    /*
     G4Track* track = step->GetTrack();
-
     G4int parentID = track->GetParentID();
     G4int stepNo =  track->GetCurrentStepNumber();
     
@@ -35,6 +34,8 @@ void SteppingAction::UserSteppingAction( const G4Step* step){
 
     G4String particle = track->GetParticleDefinition()->GetParticleName();
     G4String particleType = track->GetParticleDefinition()->GetParticleType();
+    */
+
     G4String procName = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
 
     // Collect energy and number of scatters step by step
@@ -52,5 +53,6 @@ void SteppingAction::UserSteppingAction( const G4Step* step){
     */
     
     fEventAction->GetStepCollection().push_back(StepInfo(step));
+
 }
 
