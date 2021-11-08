@@ -37,10 +37,12 @@ public:
         macros.push_back( s );
     }
 
+    /*
     void AddRandomSeeds( long seeds[], int len){
         for( int i=0; i<len; i++)
-            random_seeds.push_back( seeds[i]);
+            randomSeeds.push_back( seeds[i]);
     }
+    */
 
     TTree* GetDataTree();
 
@@ -50,16 +52,15 @@ private:
 
     CommandlineArguments* fCmdlArgs;
 
-    G4String output_name = "";
+    G4String outputName;
     
-    TFile* output_file;
-    TTree* data_tree;
+    TFile* outputFile;
+    TTree* dataTree;
 
     std::vector< G4String > macros;
-    std::vector< long > random_seeds;
+    std::vector< long > randomSeeds;
 
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

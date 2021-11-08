@@ -45,23 +45,6 @@ int main(int argc,char** argv){
     cmdl.Print();
 
 
-    // Random engine.
-    // The seed is first set by the current time. Later it will be updated by the commandline parameter if provided.
-    //
-    G4Random::setTheEngine(new CLHEP::RanecuEngine);
-
-    G4long seeds[2];
-    time_t systime = time(NULL);
-    if( cmdl.Find("seed") ){
-        seeds[0] = stol( cmdl.Get("seed"));
-    }
-    else{
-        seeds[0] = (long) systime;
-        cmdl.Insert("seed", to_string(seeds[0]) );
-    }
-    seeds[1] = (long) (systime*G4UniformRand());
-    G4cout << "Seeds for random generator are " << seeds[0] << ", " << seeds[1] << G4endl;
-    G4Random::setTheSeeds(seeds);
 
 
     //
