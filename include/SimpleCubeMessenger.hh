@@ -11,7 +11,10 @@
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 
+//#include "SimpleCube.hh"
+
 class SimpleCube;
+
 class G4UIdirectory;
 class G4UIcmdWithAString;
 

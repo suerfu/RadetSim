@@ -1,11 +1,7 @@
 
-// $Id: SimpleCubeMessenger.cc $
-//
-/// \file SimpleCubeMessenger.cc
-/// \brief Definition of the SimpleCubeMessenger class
-
 #include "SimpleCubeMessenger.hh"
 #include "SimpleCube.hh"
+
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithAString.hh"
@@ -13,13 +9,13 @@
 SimpleCubeMessenger::SimpleCubeMessenger( SimpleCube* placement) : G4UImessenger(), detector( placement ){
 
     G4String name = "simplecube";
-    G4String dirname = G4String("/")+simplecube+"/";
+    G4String dirname = G4String("/")+name+"/";
 
-    directory = new G4UIdirectory( dirname );
+    directory = new G4UIdirectory( dirname.c_str() );
     directory->SetGuidance( "A simple cube." );
 
-    LinCmd = new G4UIcmdWithADoubleAndUnit( dirname+"Lin", this );
-    LoutCmd = new G4UIcmdWithADoubleAndUnit( dirname+"Lout", this );
+    LinCmd = new G4UIcmdWithADoubleAndUnit( (dirname+"Lin").c_str(), this );
+    LoutCmd = new G4UIcmdWithADoubleAndUnit( (dirname+"Lout").c_str(), this );
 
     LinCmd->SetGuidance( "Set the length of inner side.\nUnit is cm by default." );
     LoutCmd->SetGuidance( "Set the length of outer side.\nUnit is cm by default." );
@@ -36,16 +32,16 @@ SimpleCubeMessenger::SimpleCubeMessenger( SimpleCube* placement) : G4UImessenger
     LinCmd->SetDefaultUnit( "cm" );
     LoutCmd->SetDefaultUnit( "cm" );
 
-    posCmd = new G4UIcmdWith3VectorAndUnit( dirname+"pos", this);
+    posCmd = new G4UIcmdWith3VectorAndUnit( (dirname+"pos").c_str(), this);
     posCmd->SetGuidance( "Set the position of the object to be placed.\nUnit is cm by default.");
     posCmd->SetParameterName( "x", "y", "z", false );
     posCmd->AvailableForStates( G4State_Idle );
     posCmd->SetDefaultValue( G4ThreeVector( 0, 100*CLHEP::cm, 0) );
     posCmd->SetDefaultUnit( "cm" );
 
-    angCmd_x = new G4UIcmdWithADoubleAndUnit( dirname+"rotateX", this );
-    angCmd_y = new G4UIcmdWithADoubleAndUnit( dirname+"rotateY", this );
-    angCmd_z = new G4UIcmdWithADoubleAndUnit( dirname+"rotateZ", this );
+    angCmd_x = new G4UIcmdWithADoubleAndUnit( (dirname+"rotateX").c_str(), this );
+    angCmd_y = new G4UIcmdWithADoubleAndUnit( (dirname+"rotateY").c_str(), this );
+    angCmd_z = new G4UIcmdWithADoubleAndUnit( (dirname+"rotateZ").c_str(), this );
 
     angCmd_x->SetGuidance( "Set the angle of rotation about X-axis.\nUnit is degree by default." );
     angCmd_y->SetGuidance( "Set the angle of rotation about Y-axis.\nUnit is degree by default." );
@@ -67,7 +63,7 @@ SimpleCubeMessenger::SimpleCubeMessenger( SimpleCube* placement) : G4UImessenger
     angCmd_y->SetDefaultUnit( "deg" );
     angCmd_z->SetDefaultUnit( "deg" );
 
-    place_detector = new G4UIcommand( dirname+"place", this );
+    place_detector = new G4UIcommand( (dirname+"place").c_str(), this );
     place_detector->SetGuidance( "Place a far-side detector based on the previously specified positions and angles." );
     place_detector->AvailableForStates( G4State_Idle );
 

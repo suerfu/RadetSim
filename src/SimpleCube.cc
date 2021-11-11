@@ -1,5 +1,6 @@
 
 #include "SimpleCube.hh"
+#include "SimpleCubeMessenger.hh"
 
 #include "G4Box.hh"
 #include "G4VSolid.hh"
@@ -14,6 +15,8 @@ SimpleCube::SimpleCube( GeometryManager* g) : gman(g){
     L_out = 10 * cm;
 
     fCheckOverlaps = false;
+
+    fSimpleCubeMessenger = new SimpleCubeMessenger( this );
 }
 
 

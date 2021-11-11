@@ -3,8 +3,11 @@
 
 #include "GeometryManager.hh"
 
+
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
+
+class SimpleCubeMessenger;
 
 class SimpleCube{
 
@@ -33,6 +36,8 @@ public:
     void Construct();
 
 private:
+
+    SimpleCubeMessenger* fSimpleCubeMessenger;
 
     G4double L_in, L_out;
     G4ThreeVector position;
