@@ -45,13 +45,16 @@ int main(int argc,char** argv){
     cmdl.Print();
 
 
-
+    G4UIExecutive* ui = 0;
+    if( cmdl.Find("u")==false && cmdl.Find("interactive")==false ){
+        ui = new G4UIExecutive( argc, argv );
+    }
 
     //
     G4String macroname = cmdl.Get("macro");
     if( macroname=="" ){
         macroname = cmdl.Get("m");
-        if( macroname==""){
+        if( macroname=="" && ui ==0 ){ 
             G4cerr << "Macro file not specified. It should be specified with --macro or -m option.\n";
             G4cerr << "Program usage is:\n";
             PrintUsage();
@@ -59,11 +62,6 @@ int main(int argc,char** argv){
         }
     }
 
-
-    G4UIExecutive* ui = 0;
-    if( cmdl.Find("u") || cmdl.Find("interactive") ){
-        ui = new G4UIExecutive( argc, argv );
-    }
 
 
     G4RunManager * runManager = new G4RunManager();
