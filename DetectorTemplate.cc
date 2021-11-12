@@ -154,7 +154,6 @@ int main(int argc,char** argv){
 }
 
 
-
 void PrintUsage() {
     G4cerr << "\nUsage: veto [-m macro.mac ] [-u] [-f output.root] [-r seed0 seed1] [-g generator]" << G4endl;
     G4cerr << "\t-m, used to spefify the macro file to execute.\n";

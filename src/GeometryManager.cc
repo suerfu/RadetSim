@@ -1,40 +1,56 @@
 
 #include "GeometryManager.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4RunManager.hh"
+
 
 GeometryManager::GeometryManager(){
     material_man = GetMaterialManager();
     DefineMaterials();
 }
 
+
 GeometryManager::~GeometryManager(){
-    dictionary.clear();
+    //dictionary.clear();
 }
 
+/*
 void GeometryManager::Add( G4String name, G4LogicalVolume* log, G4VPhysicalVolume* phys){
     dictionary[name] = std::make_pair( log, phys);
 }
+*/
+
 
 G4LogicalVolume* GeometryManager::GetLogicalVolume( G4String name ){
+    return G4PhysicalVolumeStore::GetInstance()->GetVolume( name )->GetLogicalVolume();
+    /*
     if( dictionary.find(name)==dictionary.end() ){
         return 0;
     }
     else{
         return dictionary[name].first;
     }
+    */
 }
 
+
 G4VPhysicalVolume* GeometryManager::GetPhysicalVolume( G4String name ){
+    return G4PhysicalVolumeStore::GetInstance()->GetVolume( name );
+    /*
     if( dictionary.find(name)==dictionary.end() ){
         return 0;
     }
     else{
         return dictionary[name].second;
     }
+    */
 }
+
 
 G4NistManager* GeometryManager::GetMaterialManager(){
     return G4NistManager::Instance();
 }
+
 
 G4Material* GeometryManager::GetMaterial(G4String name){
     return material_man->FindOrBuildMaterial( name );
@@ -64,4 +80,6 @@ void  GeometryManager::DefineMaterials( ){
 }
 
 
-
+void GeometryManager::GeometryHasBeenModified(){
+    G4RunManager::GetRunManager()->GeometryHasBeenModified();
+}

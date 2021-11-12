@@ -55,6 +55,8 @@ GeometryConstruction::~GeometryConstruction(){
 
 G4VPhysicalVolume* GeometryConstruction::Construct(){
 
+    G4cout << "Constructing geometry...\n";
+
     G4VPhysicalVolume* world_pv = ConstructWorld();
 
     /* Other user-defined geometries goes here */
@@ -75,8 +77,6 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
     G4VPhysicalVolume* world_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,0), world_lv, world_name, 0, false, 0,fCheckOverlaps);
 
     world_lv->SetVisAttributes( G4VisAttributes::Invisible );
-
-    fGeometryManager->Add( world_name, world_lv, world_pv );
 
     return world_pv;
 }
