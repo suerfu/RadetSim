@@ -39,14 +39,14 @@
 void PrintUsage();
 
 
-int main(int argc,char** argv){
+int main( int argc, char** argv ){
 
     CommandlineArguments cmdl( argc, argv);
     cmdl.Print();
 
-
     G4UIExecutive* ui = 0;
-    if( cmdl.Find("u")==false && cmdl.Find("interactive")==false ){
+    if( cmdl.Find("u")==true || cmdl.Find("interactive")==true ){
+        G4cout << "Entering interactive session..." <<G4endl;
         ui = new G4UIExecutive( argc, argv );
     }
 
@@ -117,7 +117,10 @@ int main(int argc,char** argv){
     runManager->Initialize();
     //detectorConstruction->CreateImportanceStore();
 
-    G4VisManager* visManager = new G4VisExecutive;
+    G4VisManager* visManager = 0;
+    if( cmdl.Find("V")==false){
+        visManager = new G4VisExecutive;
+    }
 
 
     // Get the pointer to the User Interface manager
@@ -133,7 +136,9 @@ int main(int argc,char** argv){
     }
     // Interactive mode
     else{
-        visManager->Initialize();
+        if( visManager!=0 ){
+            visManager->Initialize();
+        }
         UImanager->ApplyCommand("/control/execute init_vis.mac");
         if (ui->IsGUI()) {
             UImanager->ApplyCommand("/control/execute gui.mac");
@@ -141,8 +146,12 @@ int main(int argc,char** argv){
         ui->SessionStart();
     }
 
-    delete ui;
-    delete visManager;
+    if( ui ){
+        delete ui;
+    }
+    if( visManager ){
+        delete visManager;
+    }
         // Note that visManager is deleted after UI manager.
         // Otherwise seg fault upon closing GUI.
 
@@ -155,11 +164,13 @@ int main(int argc,char** argv){
 
 
 void PrintUsage() {
-    G4cerr << "\nUsage: veto [-m macro.mac ] [-u] [-f output.root] [-r seed0 seed1] [-g generator]" << G4endl;
-    G4cerr << "\t-m, used to spefify the macro file to execute.\n";
-    G4cerr << "\t-u, enter interactive session.\n";
-    G4cerr << "\t-f, spefify output ROOT file.\n";
-    G4cerr << "\t-r, spefify two random seeds to be used.\n" << G4endl;
+    G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
+    G4cerr << "\t-m/--macro,       used to spefify the macro file to execute.\n";
+    G4cerr << "\t-u/--interactive, enter interactive session.\n";
+    G4cerr << "\t-V,               disable visualization.\n";
+    G4cerr << "\t--seed,           the random seed to be used. If unspecified, current time will be used..\n";
+    G4cerr << "\t-o/--output       specify the output file name to which trajectories will be recorded.\n";
+    G4cerr << G4endl;
 }
 
 

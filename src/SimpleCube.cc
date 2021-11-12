@@ -11,7 +11,7 @@
 
 SimpleCube::SimpleCube( GeometryManager* g) : gman(g){
 
-    thisName = "cube";
+    thisName = "target";
 
     L_in = 5 * cm;
     L_out = 10 * cm;

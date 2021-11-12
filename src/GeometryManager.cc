@@ -76,7 +76,7 @@ void  GeometryManager::DefineMaterials( ){
 
     G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 
-
+    material_man->FindOrBuildMaterial( "G4_W" );
 }
 
 
