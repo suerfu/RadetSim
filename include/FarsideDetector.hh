@@ -15,7 +15,7 @@ public:
 
     ~FarsideDetector(){}
 
-    void PlaceDetector( G4String name, G4ThreeVector, G4RotationMatrix* );
+    void PlaceDetector( G4String name, G4ThreeVector p = G4ThreeVector(0,0,0), G4RotationMatrix* r = 0 );
 
 private:
 

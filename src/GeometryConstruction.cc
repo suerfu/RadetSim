@@ -8,6 +8,7 @@
 
 #include "GeometryConstructionMessenger.hh"
 #include "FarsideDetectorMessenger.hh"
+#include "FarsideDetector.hh"
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -22,7 +23,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-//#include <sstream>
+#include <sstream>
 
 
 
@@ -85,6 +86,16 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 void GeometryConstruction::ConstructUserVolumes(){
 
     simple_cube->Construct();
+
+    const int Nfs = 2;
+    FarsideDetector* fs[Nfs];
+    for( int i=0; i<Nfs; i++){
+        std::stringstream name;
+        name << "fs" << i;
+        fs[i] = new FarsideDetector( fGeometryManager );
+        fs[i] -> PlaceDetector( name.str() );
+    }
+
 }
 
 

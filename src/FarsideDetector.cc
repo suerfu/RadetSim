@@ -16,7 +16,7 @@ void FarsideDetector::PlaceDetector( G4String name, G4ThreeVector pos, G4Rotatio
     G4Material* mat = fGeometryManager->GetMaterial( "G4_Pb" );
 
     if( mother!=0 && mat!=0 ){
-
+        G4cout << "Building farside detector " << name << G4endl;
         G4Tubs* solid = new G4Tubs( name+"_solid", 0, radius, height/2, 0, CLHEP::twopi);
         G4LogicalVolume* lv = new G4LogicalVolume( solid, mat, name+"_lv" );
         G4PVPlacement( rot, pos, lv, name, mother, false, 0, false );

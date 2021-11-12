@@ -2,6 +2,7 @@
 #include "FarsideDetectorMessenger.hh"
 #include "FarsideDetector.hh"
 
+#include "G4VPhysicalVolume.hh"
 
 FarsideDetectorMessenger::FarsideDetectorMessenger( GeometryManager* gm ) : G4UImessenger(), fGeometryManager( gm ){
 
@@ -44,8 +45,8 @@ FarsideDetectorMessenger::FarsideDetectorMessenger( GeometryManager* gm ) : G4UI
     angCmd_y->SetDefaultUnit( "deg" );
     angCmd_z->SetDefaultUnit( "deg" );
 
-    placeCmd = new G4UIcmdWithAString( (dirname+"place").c_str(), this );
-    placeCmd->SetGuidance( "Place a far-side detector with the previously specified positions and angles." );
+    placeCmd = new G4UIcmdWithAString( (dirname+"set").c_str(), this );
+    placeCmd->SetGuidance( "Apply the position and orientation to the specified far-side detector." );
     placeCmd->SetParameterName( "name", false );
     placeCmd->AvailableForStates( G4State_Idle );
 
@@ -81,18 +82,19 @@ void FarsideDetectorMessenger::SetNewValue( G4UIcommand* command, G4String newVa
         rot->rotateZ( angCmd_z->GetNewDoubleValue( newValue ) );
     }
     else if( command==placeCmd ){
-        if( fGeometryManager->GetPhysicalVolume(newValue)==0 ){
-            FarsideDetector* det = new FarsideDetector( fGeometryManager );
-            det->PlaceDetector( newValue, pos, rot );
-            pos = G4ThreeVector(0,0,0);
-            rot = 0;
-            fGeometryManager->GeometryHasBeenModified();
-        }
-        else{
-            G4cerr << "Detector with name " << newValue << " already exists!" << G4endl;
+        G4VPhysicalVolume* pv = fGeometryManager->GetPhysicalVolume(newValue);
+        if( pv==0 ){
+            G4cerr << "Detector with name " << newValue << " does not exists!" << G4endl;
             pos = G4ThreeVector(0,0,0);
             delete rot;
             rot = 0;
+        }
+        else{
+            pv->SetRotation( rot );
+            pv->SetTranslation( pos );
+            pos = G4ThreeVector(0,0,0);
+            rot = 0;
+            fGeometryManager->GeometryHasBeenModified();
         }
     }
     return;
