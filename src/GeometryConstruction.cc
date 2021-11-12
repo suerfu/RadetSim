@@ -87,12 +87,16 @@ void GeometryConstruction::ConstructUserVolumes(){
 
     simple_cube->Construct();
 
-    const int Nfs = 2;
+    const int Nfs = 6;
     FarsideDetector* fs[Nfs];
     for( int i=0; i<Nfs; i++){
         std::stringstream name;
         name << "fs" << i;
         fs[i] = new FarsideDetector( fGeometryManager );
+
+        G4double distance = 50 * cm;
+        G4double angle = i*CLHEP::twopi/Nfs;
+        G4ThreeVector pos( distance*cos(angle), distance*sin(angle),0 );
         fs[i] -> PlaceDetector( name.str() );
     }
 
