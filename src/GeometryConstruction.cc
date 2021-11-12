@@ -6,31 +6,28 @@
 
 #include "G4SubtractionSolid.hh"
 
-#include "G4Material.hh"
-#include "G4NistManager.hh"
-
 #include "GeometryConstructionMessenger.hh"
+#include "FarsideDetectorMessenger.hh"
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
-#include "Randomize.hh"
 
-#include "G4IStore.hh"
+//#include "G4IStore.hh"
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-#include <sstream>
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//#include <sstream>
 
 
-GeometryConstruction::GeometryConstruction( /*RunAction* ra,*/ GeometryManager* gm) : G4VUserDetectorConstruction(),
-//    fRunAction( ra ), 
+
+GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetectorConstruction(),
+    
     fGeometryManager( gm ) {
 
     fCheckOverlaps = true;
@@ -43,12 +40,15 @@ GeometryConstruction::GeometryConstruction( /*RunAction* ra,*/ GeometryManager* 
     world_z = 1.*m;
 
     simple_cube = new SimpleCube( gm );
+
+    fFarsideMessenger = new FarsideDetectorMessenger( gm );
 }
 
 
 
 GeometryConstruction::~GeometryConstruction(){
     delete fDetectorMessenger;
+    delete fFarsideMessenger;
 }
 
 

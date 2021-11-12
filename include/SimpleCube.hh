@@ -14,7 +14,7 @@ public:
 
     SimpleCube( GeometryManager* gman);
     
-    ~SimpleCube(){ delete fSimpleCubeMessenger;}
+    ~SimpleCube();
 
     void SetMaterial( G4String material );
 

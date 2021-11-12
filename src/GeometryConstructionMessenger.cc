@@ -53,13 +53,11 @@ GeometryConstructionMessenger::GeometryConstructionMessenger( GeometryConstructi
 }
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 GeometryConstructionMessenger::~GeometryConstructionMessenger(){
 //    delete FSDistanceCmd;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 void GeometryConstructionMessenger::SetNewValue( G4UIcommand* command, G4String newValue) {
 /*

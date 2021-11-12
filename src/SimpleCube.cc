@@ -23,6 +23,11 @@ SimpleCube::SimpleCube( GeometryManager* g) : gman(g){
 }
 
 
+SimpleCube::~SimpleCube(){
+    delete fSimpleCubeMessenger;
+}
+
+
 void SimpleCube::Construct(){
     
     G4LogicalVolume* world_lv = gman->GetLogicalVolume("world");
@@ -38,7 +43,7 @@ void SimpleCube::Construct(){
     G4Material* tungsten = gman->GetMaterial("G4_W");
     G4LogicalVolume* box_lv = new G4LogicalVolume( box_solid, tungsten, thisName+"_lv");
 
-    G4VPhysicalVolume* box_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,0), box_lv, thisName, world_lv, false, 0, fCheckOverlaps);
+    new G4PVPlacement( 0, G4ThreeVector(0,0,0), box_lv, thisName, world_lv, false, 0, fCheckOverlaps);
 
 }
 

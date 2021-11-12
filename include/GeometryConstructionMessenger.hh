@@ -1,8 +1,8 @@
 /// \file GeometryConstructionMessenger.hh
 /// \brief Definition of the GeometryConstructionMessenger class
 
-#ifndef GeometryConstructionMessenger_h
-#define GeometryConstructionMessenger_h 1
+#ifndef GEOMETRYCONSTRUCTIONMESSENGER_H
+#define GEOMETRYCONSTRUCTIONMESSENGER_H 1
 
 #include "globals.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
@@ -10,10 +10,10 @@
 #include "G4UIcommand.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithAString.hh"
 
 class GeometryConstruction;
 class G4UIdirectory;
-class G4UIcmdWithAString;
 
 class GeometryConstructionMessenger: public G4UImessenger{
 
