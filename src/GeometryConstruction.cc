@@ -97,7 +97,7 @@ void GeometryConstruction::ConstructUserVolumes(){
         G4double distance = 50 * cm;
         G4double angle = i*CLHEP::twopi/Nfs;
         G4ThreeVector pos( distance*cos(angle), distance*sin(angle),0 );
-        fs[i] -> PlaceDetector( name.str() );
+        fs[i] -> PlaceDetector( name.str(), pos );
     }
 
 }
