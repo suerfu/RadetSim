@@ -86,6 +86,7 @@ void FarsideDetectorMessenger::SetNewValue( G4UIcommand* command, G4String newVa
             det->PlaceDetector( newValue, pos, rot );
             pos = G4ThreeVector(0,0,0);
             rot = 0;
+            fGeometryManager->GeometryHasBeenModified();
         }
         else{
             G4cerr << "Detector with name " << newValue << " already exists!" << G4endl;
