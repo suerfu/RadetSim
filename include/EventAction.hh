@@ -1,17 +1,22 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 
-// $Id: EventAction.hh $
-//
 /// \file EventAction.hh
 /// \brief Definition of the EventAction class
 
-#ifndef EventAction_h
-#define EventAction_h 1
+#ifndef EVENTACTION_H
+#define EVENTACTION_H 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 #include "StepInfo.hh"
 #include "RunAction.hh"
 
+
+/// This structure is simply used to store all the relevant kinetic information in a single place.
 struct KineticInfo{
 
     double rx;
@@ -29,6 +34,11 @@ struct KineticInfo{
     double time;
 };
 
+
+
+/// EventAction is responsible for processing the events.
+/// The process mainly includes iterating over the tracks/steps and write them into a ROOT file.
+
 class EventAction : public G4UserEventAction{
 
 public:
@@ -42,23 +52,30 @@ public:
     void PrintEventStatistics() const;
     
     vector<StepInfo>& GetStepCollection();
+        //!< A vector that contains each steps in this event.
 
 private:
     
     RunAction* fRunAction;
+        //!< Pointer to RunAction to get output filename, etc.
 
     CommandlineArguments* cmdl;
+        //!< Pointer to commandline arguments so that EventAction can access commandline parameters.
 
     vector<StepInfo> stepCollection;
     
     TTree* data_tree;
+        //!< Pointer to a ROOT TTree object.
 
+    // Below various IDs
     int eventID;
     int trackID;
     int parentID;
     int stepID;
 
     int max_char_len;
+        //!< Maximum character length to store in ROOT. Using char[] insteat of string will speed up things.
+
     char particleName[16];
     char volumeName[16];
     char processName[16];
@@ -71,6 +88,7 @@ private:
     G4ThreeVector momentum;
 
     KineticInfo kineticInfo;
+        //!< Kinetic information to be filled into TTree. The information will be retrieved from the ROOT TTree.
 };
 
 

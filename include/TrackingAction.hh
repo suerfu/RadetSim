@@ -1,3 +1,8 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 //
 /// \file /include/TrackingAction.hh
 /// \brief Definition of the TrackingAction class

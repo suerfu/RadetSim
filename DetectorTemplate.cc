@@ -1,11 +1,15 @@
-//
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 /// \file DetectorTemplate.cc
 /// \brief Main template for Geant4 detector simulation.
-/// It provides framework for 
+/// It provides the framework for 
 /// 1) defining and/or adding geometries
 /// 2) adding physics lists,
 /// 3) generating particles, and
-/// 4) accessing hit and trajectory information.
+/// 4) accessing and recording hit and trajectory information.
 
 #include "utility.hh"
 
@@ -13,6 +17,7 @@
 
 #include "GeometryManager.hh"
 #include "GeometryConstruction.hh"
+
 #include "GeneratorAction.hh"
 
 #include "Shielding.hh"
@@ -26,13 +31,12 @@
 #include "G4UImanager.hh"
 #include "G4UIcommand.hh"
 
-#include "G4ImportanceBiasing.hh"
-#include "G4GeometrySampler.hh"
+//#include "G4ImportanceBiasing.hh"
+//#include "G4GeometrySampler.hh"
+// Above two header files required only when using geometry importance biasing
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
-
-#include "Randomize.hh"
 
 
 /// Basic usage of the program.
@@ -40,16 +44,22 @@ void PrintUsage();
 
 
 int main( int argc, char** argv ){
-
+    
+    // Get commandline arguments.
+    //
     CommandlineArguments cmdl( argc, argv);
     cmdl.Print();
 
+    // If u or interactive is specified, initialize UI executive and prepare UI session.
+    // A non-zero pointer value is later used as a flag.
+    //
     G4UIExecutive* ui = 0;
     if( cmdl.Find("u")==true || cmdl.Find("interactive")==true ){
         G4cout << "Entering interactive session..." <<G4endl;
         ui = new G4UIExecutive( argc, argv );
     }
 
+    // If a macro is specified, get the macro name and execute the macro later.
     //
     G4String macroname = cmdl.Get("macro");
     if( macroname=="" ){
@@ -63,11 +73,11 @@ int main( int argc, char** argv ){
     }
 
 
-
     G4RunManager * runManager = new G4RunManager();
 
 
     // Construct detector geometry
+    // GeometryManager is simply a central place to obtain information regarding the geometries and materials used in this program.
     //
     GeometryManager* geometryManager = new GeometryManager();
     GeometryConstruction* detectorConstruction = new GeometryConstruction( geometryManager );
@@ -75,10 +85,12 @@ int main( int argc, char** argv ){
 
 
     // Physics list
+    // For now, simply use the shielding physics list. This may be changed in the future for more customization.
     //
     G4VModularPhysicsList* physicsList = new Shielding;
+
 /*
-    // Configure Biasing
+    // Configure geometry importance biasing
     G4GeometrySampler geom_sampler_gamma(detectorConstruction->GetWorldPhysical(),"gamma");
     physicsList->RegisterPhysics( new G4ImportanceBiasing(&geom_sampler_gamma) );
     G4GeometrySampler geom_sampler_e(detectorConstruction->GetWorldPhysical(),"e-");
@@ -86,14 +98,13 @@ int main( int argc, char** argv ){
     G4GeometrySampler geom_sampler_ep(detectorConstruction->GetWorldPhysical(),"e+");
     physicsList->RegisterPhysics( new G4ImportanceBiasing(&geom_sampler_ep) );
 */
+    // Note below line has to be after setting up biasing.
     runManager->SetUserInitialization( physicsList );
 
 
     // Run action
     //
     RunAction* runAction = new RunAction( &cmdl );
-    //runAction->SetOutputFileName( filename );
-    //runAction->AddRandomSeeds( seeds, 2);
     runManager->SetUserAction( runAction );
 
 
@@ -103,38 +114,48 @@ int main( int argc, char** argv ){
     runManager->SetUserAction( generatorAction );
 
 
-
-
     // Event action
+    //
     EventAction* eventAction = new EventAction( runAction );
     runManager->SetUserAction( eventAction );
 
+
     // Tracking, stepping and stacking action
+    //
     runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
     runManager->SetUserAction( new SteppingAction( runAction, eventAction, detectorConstruction ) );
     runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
 
+
     runManager->Initialize();
     //detectorConstruction->CreateImportanceStore();
 
+
+    // Visualization should be turned on when
+    // 1. UI is enabled and 
+    // 2. visualization is not explicitly disabled.
+    //
     G4VisManager* visManager = 0;
-    if( cmdl.Find("V")==false){
+    if( cmdl.Find("V")==false && ui!=0 ){
         visManager = new G4VisExecutive;
     }
 
 
     // Get the pointer to the User Interface manager
+    // 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-    // Process macro or start UI session
-  
+
+    // Process macro or start UI session  
     // Batch mode
+    // 
     if ( macroname!="" ){
         runAction->AddMacro( macroname );
         G4String command = "/control/execute ";
         UImanager->ApplyCommand( command+macroname );
     }
     // Interactive mode
+    //
     else{
         if( visManager!=0 ){
             visManager->Initialize();
@@ -146,18 +167,18 @@ int main( int argc, char** argv ){
         ui->SessionStart();
     }
 
+
+    // End of run
+    //
     if( ui ){
         delete ui;
     }
     if( visManager ){
         delete visManager;
     }
-        // Note that visManager is deleted after UI manager.
-        // Otherwise seg fault upon closing GUI.
 
-    // Free the store: user actions, physics_list and detector_description are
-    // owned and deleted by the run manager, so they should not be deleted
-    // in the main() program !
+    // Note that visManager is deleted after UI manager.
+    // Otherwise seg fault upon closing GUI.
 
     delete runManager;
 }

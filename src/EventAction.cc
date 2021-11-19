@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 /// \file EventAction.cc
 /// \brief Implementation of the EventAction class
 
@@ -19,11 +23,9 @@
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction( RunAction* runaction )
- : G4UserEventAction(),
-   fRunAction(runaction) {
+
+EventAction::EventAction( RunAction* runaction ) : G4UserEventAction(), fRunAction(runaction) {
 
     data_tree = 0;
     eventID = 0;

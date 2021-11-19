@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 #include "SimpleCube.hh"
 #include "SimpleCubeMessenger.hh"
 

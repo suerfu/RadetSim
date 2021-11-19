@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 /// \file SteppingAction.cc
 /// \brief Implementation of the SteppingAction class
 

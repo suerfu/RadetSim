@@ -1,3 +1,9 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 #ifndef SIMPLECUBE_H
 #define SIMPLECUBE_H 1
 

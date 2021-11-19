@@ -1,3 +1,9 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 #ifndef FARSIDEDETECTOR_H
 #define FARSIDEDETECTOR_H 1
 

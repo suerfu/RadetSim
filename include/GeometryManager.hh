@@ -1,3 +1,9 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 #ifndef GEOMETRYMANAGER_H
 #define GEOMETRYMANAGER_H 1
 

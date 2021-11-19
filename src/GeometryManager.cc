@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 #include "GeometryManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4RunManager.hh"

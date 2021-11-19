@@ -1,11 +1,17 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 //
 // $Id: StepInfo.hh $
 //
 /// \file StepInfo.hh
 /// \brief Definition of the StepInfoclass
 
-#ifndef StepInfo_h
-#define StepInfo_h 1
+#ifndef STEPINFO_H
+#define STEPINFO_H 1
 
 #include "globals.hh"
 #include "G4Step.hh"
@@ -13,9 +19,11 @@
 
 using namespace std;
 
-class StepInfo
-{
-  public:
+class EventAction;
+
+class StepInfo{
+
+public:
     StepInfo();
     StepInfo( const G4Step* );
     virtual ~StepInfo();
@@ -62,7 +70,7 @@ class StepInfo
     G4String GetProcessName();
     void SetProcessName( G4String );
 
-  private:
+private:
 
     G4int eventID;
     G4int trackID;
@@ -85,6 +93,7 @@ class StepInfo
 
     G4String process_name;
 
+    friend EventAction;
 };
 
 #endif
