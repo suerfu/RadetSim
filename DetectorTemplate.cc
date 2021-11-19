@@ -65,8 +65,6 @@ int main( int argc, char** argv ){
     if( macroname=="" ){
         macroname = cmdl.Get("m");
         if( macroname=="" && ui ==0 ){ 
-            G4cerr << "Macro file not specified. It should be specified with --macro or -m option.\n";
-            G4cerr << "Program usage is:\n";
             PrintUsage();
             return -2;
         }
@@ -140,7 +138,7 @@ int main( int argc, char** argv ){
     // 2. visualization is not explicitly disabled.
     //
     G4VisManager* visManager = 0;
-    if( cmdl.Find("V")==false && ui!=0 ){
+    if( cmdl.Find("vis")==true && ui!=0 ){
         visManager = new G4VisExecutive;
     }
 
@@ -192,8 +190,8 @@ void PrintUsage() {
     G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
     G4cerr << "\t-m/--macro,       used to spefify the macro file to execute.\n";
     G4cerr << "\t-u/--interactive, enter interactive session.\n";
-    G4cerr << "\t-V,               disable visualization.\n";
-    G4cerr << "\t--seed,           the random seed to be used. If unspecified, current time will be used..\n";
+    G4cerr << "\t--vis,            enable visualization. (disabled by default)\n";
+    G4cerr << "\t--seed,           the random seed to be used. (default current time)\n";
     G4cerr << "\t-o/--output       specify the output file name to which trajectories will be recorded.\n";
     G4cerr << G4endl;
 }
