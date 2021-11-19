@@ -188,7 +188,7 @@ int main( int argc, char** argv ){
 
 void PrintUsage() {
     G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
-    G4cerr << "\t-m/--macro,       used to spefify the macro file to execute.\n";
+    G4cerr << "\t-m/--macro,       used to specify the macro file to execute.\n";
     G4cerr << "\t-u/--interactive, enter interactive session.\n";
     G4cerr << "\t--vis,            enable visualization. (disabled by default)\n";
     G4cerr << "\t--seed,           the random seed to be used. (default current time)\n";
