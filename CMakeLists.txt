@@ -52,21 +52,15 @@ target_link_libraries(DetectorTemplate ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 # build DetectorTemplate. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(VETO_SCRIPTS
-  /macros/Pb_K40.mac
-  /macros/Pb_U238.mac
-  /macros/Pb_Th232.mac
+set(SCRIPTS
   /macros/gui.mac
   /macros/init_vis.mac
   /macros/vis.mac
   /macros/icons.mac
-  /macros/test_geometry.mac
-  /macros/impurity_Cu_K40.mac
-  /macros/impurity_Cu_U238.mac
-  /macros/impurity_Cu_Th232.mac
+  /macros/test.mac
   )
 
-foreach(_script ${VETO_SCRIPTS})
+foreach(_script ${SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}

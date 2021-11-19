@@ -1,3 +1,9 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 #ifndef GEOMETRYMANAGER_H
 #define GEOMETRYMANAGER_H 1
 
@@ -19,7 +25,7 @@ public:
 
     ~GeometryManager();
 
-    void Add( G4String name, G4LogicalVolume* log, G4VPhysicalVolume* phys);
+    //void Add( G4String name, G4LogicalVolume* log, G4VPhysicalVolume* phys);
 
     G4LogicalVolume* GetLogicalVolume( G4String name );
 
@@ -27,11 +33,13 @@ public:
 
     G4NistManager* GetMaterialManager();
 
-    G4Material* GetMaterial(G4String name);
+    G4Material* GetMaterial( G4String name );
+
+    void GeometryHasBeenModified();
 
 private:
 
-    std::map< G4String, std::pair<G4LogicalVolume*, G4VPhysicalVolume*> > dictionary;
+    //std::map< G4String, std::pair<G4LogicalVolume*, G4VPhysicalVolume*> > dictionary;
 
     G4NistManager* material_man;
 

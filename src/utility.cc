@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 #include "utility.hh"
 
 
@@ -46,11 +50,14 @@ CommandlineArguments::CommandlineArguments( int argc, char** argv ){
         string input = FormatArgument( newKey, argv[i] );
 
         if( newKey==true){
+            //cout << "Adding key " << input << endl;
             key = input;
+            cmdl[key] = "";
             newKey = false;
         }
         else{
             cmdl[key] = input;
+            //cout << "Setting value " << key << " " << input << endl;
         }
     }
 }
@@ -67,7 +74,7 @@ void CommandlineArguments::Print(){
 
     ArgumentMap::iterator itr;
     for( itr = cmdl.begin(); itr!=cmdl.end(); itr++ ){
-        cout << '\t' << itr->first << " : " << itr->second << endl;
+        std::cout << '\t' << itr->first << " : " << itr->second << std::endl;
     }
 
 }
@@ -85,7 +92,7 @@ int CommandlineArguments::GetInt( string key ){
         return stoi( cmdl[key] );
     }
     else{
-        cerr << "Commandline arguments does not have Key = " << key << endl;
+        std::cerr << "Commandline arguments does not have Key = " << key << std::endl;
         return -1;
     }
 }
@@ -97,7 +104,7 @@ float CommandlineArguments::GetFloat( string key ){
         return stof( cmdl[key] );
     }
     else{
-        cerr << "Commandline arguments does not have Key = " << key << endl;
+        std::cerr << "Commandline arguments does not have Key = " << key << std::endl;
         return -1;
     }
 }
@@ -118,6 +125,6 @@ void CommandlineArguments::Insert( string s, string v){
         cmdl[s] = v;
     }
     else{
-        cerr << "Key " << s << " already exists. Not inserted.\n";
+        std::cerr << "Key " << s << " already exists. Not inserted.\n";
     }
 }

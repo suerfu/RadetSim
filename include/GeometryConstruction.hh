@@ -1,24 +1,26 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 /// \file GeometryConstruction.hh
 /// \brief Definition of the GeometryConstruction class
 
-#ifndef GeometryConstruction_h
-#define GeometryConstruction_h 1
+#ifndef GEOMETRYCONSTRUCTION_H
+#define GEOMETRYCONSTRUCTION_H 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "GeometryManager.hh"
-#include "RunAction.hh"
 
 #include "SimpleCube.hh"
+#include "FarsideDetectorMessenger.hh"
 
 #include "globals.hh"
-//#include "G4RotationMatrix.hh"
 
-class G4LogicalVolume;
-class G4VPhysicalVolume;
-class G4Material;
-class G4UserLimits;
+
 class GeometryConstructionMessenger;
-class G4VIStore;
+
 
 /// Detector construction class to define materials and geometry.
 
@@ -28,7 +30,7 @@ class GeometryConstruction : public G4VUserDetectorConstruction{
 
 public:
 
-    GeometryConstruction( /*RunAction* ra,*/ GeometryManager* man );
+    GeometryConstruction( GeometryManager* man );
 
     virtual ~GeometryConstruction();
 
@@ -46,10 +48,11 @@ public:
 
 private:
 
-    //RunAction* fRunAction;
-    GeometryConstructionMessenger* fDetectorMessenger;
     GeometryManager* fGeometryManager;
-    
+    GeometryConstructionMessenger* fDetectorMessenger;
+
+    FarsideDetectorMessenger* fFarsideMessenger;
+
     bool fCheckOverlaps;
 
     G4double world_x;

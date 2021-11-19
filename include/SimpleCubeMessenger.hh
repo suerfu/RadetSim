@@ -1,3 +1,9 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
+
 /// \file SimpleCubeMessenger.hh
 /// \brief Definition of the SimpleCubeMessenger class
 
@@ -10,10 +16,10 @@
 #include "G4UIcommand.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithAString.hh"
 
 class SimpleCube;
-class G4UIdirectory;
-class G4UIcmdWithAString;
+
 
 class SimpleCubeMessenger: public G4UImessenger{
 
@@ -31,20 +37,22 @@ private:
 
     G4UIdirectory* directory;
     
-    G4UIcmdWithADoubleAndUnit* LinCmd;
-    G4UIcmdWithADoubleAndUnit* LoutCmd;
-        // Size of the cube.
+    G4UIcmdWithAString* materialCmd;
+        // Material of the target.
 
     G4UIcmdWith3VectorAndUnit* posCmd;
-        // Position of the cube
+        // Position of the target
 
     G4UIcmdWithADoubleAndUnit* angCmd_x;
     G4UIcmdWithADoubleAndUnit* angCmd_y;
     G4UIcmdWithADoubleAndUnit* angCmd_z;
-        // Orientation
+        // Orientation of the target
 
-    G4UIcommand* place_detector;
+    //G4UIcommand* place_detector;
         // Place the actual object
+
+    G4String name = "target";
+    G4String dirname = G4String("/")+name+"/";
 };
 
 #endif

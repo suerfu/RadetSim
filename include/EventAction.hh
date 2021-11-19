@@ -1,22 +1,29 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 
-// $Id: EventAction.hh $
-//
 /// \file EventAction.hh
 /// \brief Definition of the EventAction class
 
-#ifndef EventAction_h
-#define EventAction_h 1
+#ifndef EVENTACTION_H
+#define EVENTACTION_H 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 #include "StepInfo.hh"
 #include "RunAction.hh"
 
+
+/// EventAction is responsible for processing the events.
+/// The process mainly includes iterating over the tracks/steps and write them into a ROOT file.
+
 class EventAction : public G4UserEventAction{
 
 public:
 
-    EventAction( RunAction* input_run_action );
+    EventAction( RunAction* runaction );
     virtual ~EventAction();
 
     virtual void BeginOfEventAction(const G4Event* event);
@@ -25,52 +32,38 @@ public:
     void PrintEventStatistics() const;
     
     vector<StepInfo>& GetStepCollection();
+        //!< A vector that contains each steps in this event.
 
 private:
     
-    RunAction* run_action;
+    RunAction* fRunAction;
+        //!< Pointer to RunAction to get output filename, etc.
 
     CommandlineArguments* cmdl;
+        //!< Pointer to commandline arguments so that EventAction can access commandline parameters.
 
     vector<StepInfo> stepCollection;
     
     TTree* data_tree;
-
-    int eventID;
-    int trackID;
-    int stepID;
-    int parentID;
+        //!< Pointer to a ROOT TTree object.
 
     int max_char_len;
-    char particle_name[16];
-    char volume_name[16];
-    char process_name[16];
+        //!< Maximum character length to store in ROOT. Using char[] insteat of string will speed up things.
 
-    G4String tmp_particle_name;
-    G4String tmp_volume_name;
-    G4String tmp_process_name;
+    char particleName[16];
+    char volumeName[16];
+    char processName[16];
+
+    G4String tmp_particleName;
+    G4String tmp_volumeName;
+    G4String tmp_processName;
     
     G4ThreeVector position;
-    double x;
-    double y;
-    double z;
-    double r;
-    double rphi;
-
     G4ThreeVector momentum;
-    double px;
-    double py;
-    double pz;
-    double theta;
-    double phi;
 
-    double Eki;
-    double Ekf;
-    double edep;
-    
-    double global_time;
+    StepInfo wStep;
+        //!< StepInfo for writing to ROOT output.
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

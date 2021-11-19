@@ -1,9 +1,12 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 /// \file EventAction.cc
 /// \brief Implementation of the EventAction class
 
 #include "EventAction.hh"
-#include "RunAction.hh"
 
 #include "G4RunManager.hh"
 #include "G4Event.hh"
@@ -19,99 +22,84 @@
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction( RunAction* input_run_action )
- : G4UserEventAction(),
-   run_action(input_run_action),
-   stepCollection(),
-   data_tree(0),
-   eventID(0),
-   trackID(0),
-   stepID(0),
-   parentID(0),
-   tmp_particle_name(""),
-   tmp_volume_name(""),
-   tmp_process_name(""),
-   position(0),
-   x(0),
-   y(0),
-   z(0),
-   momentum(0),
-   px(0),
-   py(0),
-   pz(0),
-   Eki(0),
-   Ekf(0),
-   edep(0),
-   global_time(0)
-{
+
+EventAction::EventAction( RunAction* runaction ) : G4UserEventAction(), fRunAction(runaction) {
+
+    data_tree = 0;
+
+    wStep = StepInfo();
+
+    tmp_particleName = "";
+    tmp_volumeName = "";
+    tmp_processName = "";
+
     max_char_len = 15;
-    cmdl = run_action->GetCommandlineArguments();
+    cmdl = fRunAction->GetCommandlineArguments();
 }
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 
 EventAction::~EventAction(){}
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-
 void EventAction::PrintEventStatistics() const {}
-
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 
 void EventAction::BeginOfEventAction(const G4Event*){
     
     // If pointer to ROOT tree is empty, then ask RunAction to create the ROOT tree
     // and assign address of variables for output.
+    // 
     if( data_tree==0 ){
 
-        data_tree = run_action->GetDataTree();
+        data_tree = fRunAction->GetDataTree();
 
         // Proceed only if data output is enabled.
         if( data_tree!=0 ){
+
             // information about its order in the event/run sequence
-            data_tree->Branch("eventID", &eventID, "eventID/I");
-            data_tree->Branch("trackID", &trackID, "trackID/I");
-            data_tree->Branch("stepID", &stepID, "stepID/I");
+            //
+            data_tree->Branch("eventID", &wStep.eventID, "eventID/I");
+            data_tree->Branch("trackID", &wStep.trackID, "trackID/I");
 
             // information about its idenity
-            data_tree->Branch("particle", particle_name, "particle[16]/C");
-            data_tree->Branch("parentID", &parentID, "parentID/I");
+            //
+            data_tree->Branch("particle", particleName, "particle[16]/C");
+                // Strings must be handled indirectly since it should not be filled directly.
+                // If done directly, it becomes a vector of variable length and subsequent reading speed becomes very low.
+            data_tree->Branch("parentID", &wStep.parentID, "parentID/I");
+            data_tree->Branch("stepID", &wStep.stepID, "stepID/I");
 
             // geometric information
-            data_tree->Branch("volume", volume_name, "volume[16]/C");
-            data_tree->Branch("x", &x, "x/D");
-            data_tree->Branch("y", &y, "y/D");
-            data_tree->Branch("z", &z, "z/D");
-            data_tree->Branch("px", &px, "px/D");
-            data_tree->Branch("py", &py, "py/D");
-            data_tree->Branch("pz", &pz, "pz/D");
+            //
+            data_tree->Branch("volume", volumeName, "volume[16]/C");
+            data_tree->Branch("rx", &wStep.rx, "rx/D");
+            data_tree->Branch("ry", &wStep.ry, "ry/D");
+            data_tree->Branch("rz", &wStep.rz, "rz/D");
+            data_tree->Branch("px", &wStep.px, "px/D");
+            data_tree->Branch("py", &wStep.py, "py/D");
+            data_tree->Branch("pz", &wStep.pz, "pz/D");
 
             // dynamic information
-            data_tree->Branch("t", &global_time, "t/D");
-            data_tree->Branch("Eki", &Eki, "Eki/D"); // initial kinetic energy before the step
-            data_tree->Branch("Ekf", &Ekf, "Ekf/D"); // final kinetic energy after the step
-            data_tree->Branch("Edep", &edep, "Edep/D"); // energy deposit calculated by Geant4
-            data_tree->Branch("process", process_name, "process[16]/C");
+            //
+            data_tree->Branch("t", &wStep.globalTime, "t/D");
+            data_tree->Branch("Eki", &wStep.Eki, "Eki/D"); // initial kinetic energy before the step
+            data_tree->Branch("Ekf", &wStep.Ekf, "Ekf/D"); // final kinetic energy after the step
+            data_tree->Branch("Edep", &wStep.Edep, "Edep/D"); // energy deposit calculated by Geant4
+
+            data_tree->Branch("process", processName, "process[16]/C");
         }
     }
 
+    //At the beginning of the event, insert a special flag.
     StepInfo stepinfo;
-    stepinfo.SetProcessName( "newEvent" );
+    stepinfo.processName = "newEvent";
     GetStepCollection().push_back(stepinfo);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 
 void EventAction::EndOfEventAction(const G4Event* event){
-
 
     // Print per event (modulo n)
     G4int evtID = event->GetEventID();
@@ -124,59 +112,32 @@ void EventAction::EndOfEventAction(const G4Event* event){
 
         // Filter for event recording. 
         // For different application, this should be changed.
-        bool record = false;        
+        bool record = false;
+        
+        // Some filter criteria goes here.
         for( size_t i=0; i < stepCollection.size(); ++i ){
-            if( stepCollection[i].GetVolumeName()=="chamber" ){
+            if( fRunAction->RecordWhenHit( stepCollection[i].volumeName ) ){
                 record = true;
                 break;
             }
         }
+        
 
         if( record==true ){
 
-            bool NewEvtMarker = false;
-            G4String EventType = "";
-
             for( size_t i=0; i < stepCollection.size(); ++i ){
-            
-                tmp_process_name = stepCollection[i].GetProcessName();
-                if( tmp_process_name=="newEvent" || tmp_process_name=="timeReset"){
-                    EventType = tmp_process_name;
-                    NewEvtMarker = true;
-                    continue;
-                }
-                if( NewEvtMarker==true ){
-                    tmp_process_name = EventType;
-                    NewEvtMarker = false;
-                }
+                
+                // If process name is newEvent or timeReset, it means the end of previous event and one should write all the output.
+                //
+                wStep = stepCollection[i];
 
-                tmp_particle_name = stepCollection[i].GetParticleName();
-                tmp_volume_name = stepCollection[i].GetVolumeName();
+                tmp_particleName = stepCollection[i].particleName;
+                tmp_volumeName = stepCollection[i].volumeName;
+                tmp_processName = stepCollection[i].processName;
 
-                eventID = stepCollection[i].GetEventID();
-                trackID = stepCollection[i].GetTrackID();
-                stepID = stepCollection[i].GetStepID();
-                parentID = stepCollection[i].GetParentID();
-
-                strncpy( particle_name, tmp_particle_name.c_str(), max_char_len);
-                strncpy( process_name, tmp_process_name.c_str(), max_char_len);
-                strncpy( volume_name, tmp_volume_name.c_str(), max_char_len);
-
-                Eki = stepCollection[i].GetEki();
-                Ekf = stepCollection[i].GetEkf();
-                edep = stepCollection[i].GetDepositedEnergy();
-            
-                position = stepCollection[i].GetPosition();
-                x = position.x();
-                y = position.y();
-                z = position.z();
-
-                momentum = stepCollection[i].GetMomentumDirection();
-                px = momentum.x();
-                py = momentum.y();
-                pz = momentum.z();
-
-                global_time = stepCollection[i].GetGlobalTime();
+                strncpy( particleName, tmp_particleName.c_str(), max_char_len);
+                strncpy( processName, tmp_processName.c_str(), max_char_len);
+                strncpy( volumeName, tmp_volumeName.c_str(), max_char_len);
 
                 data_tree->Fill();
             }
@@ -186,10 +147,9 @@ void EventAction::EndOfEventAction(const G4Event* event){
     stepCollection.clear();
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 
 vector<StepInfo>& EventAction::GetStepCollection(){
     return stepCollection;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

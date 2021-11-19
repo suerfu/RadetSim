@@ -1,7 +1,11 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 //
 /// \file /include/TrackingAction.hh
 /// \brief Definition of the TrackingAction class
-//
 //
 
 #ifndef TrackingAction_h
@@ -13,6 +17,9 @@
 
 class EventAction;
 
+
+/// This class is mainly implemented to insert a special step at the beginning of a track.
+///
 class TrackingAction : public G4UserTrackingAction {
 
 public:
@@ -22,13 +29,13 @@ public:
     virtual ~TrackingAction() {};
 
     virtual void PreUserTrackingAction(const G4Track*);
+        //!< This method inserts a special step at the beginning of the track.
 
 private:
 
     RunAction* fRunAction;
 
     EventAction* fEventAction;
-
 };
 
 

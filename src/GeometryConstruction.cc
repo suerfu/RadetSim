@@ -1,4 +1,8 @@
-
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 /// \file GeometryConstruction.cc
 /// \brief Implementation of the GeometryConstruction class
 
@@ -6,31 +10,29 @@
 
 #include "G4SubtractionSolid.hh"
 
-#include "G4Material.hh"
-#include "G4NistManager.hh"
-
 #include "GeometryConstructionMessenger.hh"
+#include "FarsideDetectorMessenger.hh"
+#include "FarsideDetector.hh"
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
-#include "Randomize.hh"
 
-#include "G4IStore.hh"
+//#include "G4IStore.hh"
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
 #include <sstream>
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 
-GeometryConstruction::GeometryConstruction( /*RunAction* ra,*/ GeometryManager* gm) : G4VUserDetectorConstruction(),
-//    fRunAction( ra ), 
+GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetectorConstruction(),
+    
     fGeometryManager( gm ) {
 
     fCheckOverlaps = true;
@@ -43,17 +45,22 @@ GeometryConstruction::GeometryConstruction( /*RunAction* ra,*/ GeometryManager* 
     world_z = 1.*m;
 
     simple_cube = new SimpleCube( gm );
+
+    fFarsideMessenger = new FarsideDetectorMessenger( gm );
 }
 
 
 
 GeometryConstruction::~GeometryConstruction(){
     delete fDetectorMessenger;
+    delete fFarsideMessenger;
 }
 
 
 
 G4VPhysicalVolume* GeometryConstruction::Construct(){
+
+    G4cout << "Constructing geometry...\n";
 
     G4VPhysicalVolume* world_pv = ConstructWorld();
 
@@ -76,8 +83,6 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 
     world_lv->SetVisAttributes( G4VisAttributes::Invisible );
 
-    fGeometryManager->Add( world_name, world_lv, world_pv );
-
     return world_pv;
 }
 
@@ -85,6 +90,20 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 void GeometryConstruction::ConstructUserVolumes(){
 
     simple_cube->Construct();
+
+    const int Nfs = 6;
+    FarsideDetector* fs[Nfs];
+    for( int i=0; i<Nfs; i++){
+        std::stringstream name;
+        name << "fs" << i;
+        fs[i] = new FarsideDetector( fGeometryManager );
+
+        G4double distance = 50 * cm;
+        G4double angle = i*CLHEP::twopi/Nfs;
+        G4ThreeVector pos( distance*cos(angle), distance*sin(angle),0 );
+        fs[i] -> PlaceDetector( name.str(), pos );
+    }
+
 }
 
 

@@ -1,3 +1,8 @@
+/*
+    Author:  Burkhant Suerfu
+    Date:    November 18, 2021
+    Contact: suerfu@berkeley.edu
+*/
 //
 /// \file /src/TrackingAction.cc
 /// \brief Implementation of the TrackingAction class
@@ -22,25 +27,43 @@ TrackingAction::TrackingAction(RunAction* runAction, EventAction* eventAction)
 
 
 void TrackingAction::PreUserTrackingAction(const G4Track* track){
-
+    
     G4String procName = "initStep";
 
-    // We have to set up the initStep by hand
+    // Set up the initStep by hand
+    //
     StepInfo stepInfo;
 
-    stepInfo.SetEventID(G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID());
-    stepInfo.SetTrackID(track->GetTrackID());
-    stepInfo.SetStepID( track->GetCurrentStepNumber() );
-    stepInfo.SetParentID(track->GetParentID());
-    stepInfo.SetParticleName(track->GetParticleDefinition()->GetParticleName());
-    stepInfo.SetVolumeName(track->GetVolume()->GetName());
-    stepInfo.SetVolumeCopyNumber(track->GetVolume()->GetCopyNo());
-    stepInfo.SetEki(track->GetKineticEnergy());
-    stepInfo.SetEkf(track->GetKineticEnergy());
-    stepInfo.SetPosition(track->GetPosition());
-    stepInfo.SetMomentumDirection(track->GetMomentumDirection());
-    stepInfo.SetGlobalTime(track->GetGlobalTime());
-    stepInfo.SetProcessName( procName );
+
+    // First check if the particle should be excluded.
+    //
+    stepInfo.particleName = track->GetParticleDefinition()->GetParticleName();
+    if( fRunAction->ExcludeParticle( stepInfo.particleName) ){
+        return;
+    }
+    
+    // Next check for exclude volume
+    //
+    stepInfo.volumeName = track->GetVolume()->GetName();
+    if( fRunAction->ExcludeVolume( stepInfo.volumeName) ){
+        return;
+    }
+
+    stepInfo.eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
+    stepInfo.trackID = track->GetTrackID();
+    stepInfo.stepID =  track->GetCurrentStepNumber();
+    stepInfo.parentID = track->GetParentID();
+
+    stepInfo.volumeCopyNumber = track->GetVolume()->GetCopyNo();
+
+    stepInfo.position = track->GetPosition();
+    stepInfo.momentumDir = track->GetMomentumDirection();
+    stepInfo.globalTime = track->GetGlobalTime();
+
+    stepInfo.Eki = track->GetKineticEnergy();
+    stepInfo.Ekf = track->GetKineticEnergy();
+
+    stepInfo.processName = procName;
 
     fEventAction->GetStepCollection().push_back(stepInfo);
 }
