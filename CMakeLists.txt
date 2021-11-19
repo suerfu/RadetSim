@@ -57,6 +57,7 @@ set(SCRIPTS
   /macros/init_vis.mac
   /macros/vis.mac
   /macros/icons.mac
+  /macros/test.mac
   )
 
 foreach(_script ${SCRIPTS})
