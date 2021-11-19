@@ -66,11 +66,9 @@ SimpleCubeMessenger::SimpleCubeMessenger( SimpleCube* placement) : G4UImessenger
 }
 
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 SimpleCubeMessenger::~SimpleCubeMessenger(){}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 void SimpleCubeMessenger::SetNewValue( G4UIcommand* command, G4String newValue) {
 

@@ -44,7 +44,6 @@ GeneratorMessenger::GeneratorMessenger( GeneratorAction* generator )  : G4UImess
 
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 GeneratorMessenger::~GeneratorMessenger(){
 
@@ -56,7 +55,6 @@ GeneratorMessenger::~GeneratorMessenger(){
     delete cmdSetWall;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 void GeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
 
@@ -85,4 +83,3 @@ void GeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
     }
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....

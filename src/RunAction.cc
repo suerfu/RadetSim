@@ -39,7 +39,7 @@ RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(),
     else{
         seeds[0] = (long) systime;
     }
-    seeds[1] = (long) (systime*G4UniformRand());
+    seeds[1] = (long) (seeds[0]*G4UniformRand());
     
     G4Random::setTheSeeds(seeds);
 
