@@ -3,13 +3,13 @@
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
-// $Id: RunAction.cc $
 //
 /// \file RunAction.cc
 /// \brief Implementation of the RunAction class
 
 
 #include "RunAction.hh"
+#include "RunActionMessenger.hh"
 
 #include "G4Run.hh"
 #include "G4RunManager.hh"
@@ -19,10 +19,11 @@
 #include "TFile.h"
 #include "TTree.h"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(),
-    fCmdlArgs( c ){
+     fRunActionMessenger(0), fCmdlArgs( c ){
+
+    fRunActionMessenger = new RunActionMessenger( this );
 
     // Configure the random engine.
     // The seed is first set by the current time.
@@ -42,6 +43,8 @@ RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(),
     
     G4Random::setTheSeeds(seeds);
 
+    // Aldo keep a record of randomSeeds for later output
+    //
     randomSeeds.push_back( seeds[0] );
     randomSeeds.push_back( seeds[1] );
 
@@ -77,6 +80,8 @@ void RunAction::SetOutputFileName( G4String newname ){
 
 void RunAction::BeginOfRunAction(const G4Run* /*run*/){
 
+    // If output name is specified, create a ROOT file and a TTree.
+    //
     if( outputName!="" ){
 
         outputFile = new TFile(outputName, "NEW");
@@ -94,6 +99,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/){
 void RunAction::EndOfRunAction(const G4Run* /*run*/){
 
     if( outputFile!=0 ) {
+
         for( unsigned int i=0; i<macros.size(); i++){
             TMacro mac( macros[i] );
             mac.Write();    
@@ -117,3 +123,33 @@ void RunAction::EndOfRunAction(const G4Run* /*run*/){
 TTree* RunAction::GetDataTree(){
     return dataTree;
 }
+
+
+void RunAction::AddRecordWhenHit( G4String a){ recordWhenHit.insert(a); }
+
+
+bool RunAction::RecordWhenHit( G4String s ){
+    return recordWhenHit.find(s)!=recordWhenHit.end();
+}
+
+void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
+
+
+bool RunAction::ExcludeParticle( G4String s){
+    return excludeParticle.find(s)!=excludeParticle.end();
+}
+
+
+void RunAction::AddExcludeVolume( G4String a){ excludeVolume.insert(a); }
+
+bool RunAction::ExcludeVolume( G4String s){
+    return excludeVolume.find(s)!=excludeVolume.end();
+}
+
+
+void RunAction::AddExcludeProcess( G4String a){ excludeProcess.insert(a); }
+
+bool RunAction::ExcludeProcess( G4String s){
+    return excludeProcess.find(s)!=excludeProcess.end();
+}
+

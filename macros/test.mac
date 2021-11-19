@@ -1,0 +1,12 @@
+/run/initialize
+/tracking/verbose 2
+
+/filter/excludeParticle e-
+/filter/excludeVolume fs1
+/filter/recordWhenHit target
+
+/gps/particle   ion
+/gps/ion 92 238
+/gps/energy 0 keV
+
+/run/beamOn 1

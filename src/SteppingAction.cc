@@ -3,6 +3,7 @@
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
+
 /// \file SteppingAction.cc
 /// \brief Implementation of the SteppingAction class
 
@@ -16,38 +17,41 @@
 #include "StepInfo.hh"
 
 
-SteppingAction::SteppingAction( RunAction* runAction, EventAction* eventAction, const GeometryConstruction* detectorConstruction ) : G4UserSteppingAction(),
-        fRunAction( runAction ),
-        fEventAction( eventAction ),
-        fDetectorConstruction( detectorConstruction ){
-}
+SteppingAction::SteppingAction( RunAction* runAction, EventAction* eventAction ) : G4UserSteppingAction(),
+    fRunAction( runAction ),
+    fEventAction( eventAction )
+{}
 
 
-SteppingAction::~SteppingAction(){ }
+SteppingAction::~SteppingAction(){}
 
 
 void SteppingAction::UserSteppingAction( const G4Step* step){
     
-    /*
+    // Get the current track.
+    //
     G4Track* track = step->GetTrack();
-    G4int parentID = track->GetParentID();
-    G4int stepNo =  track->GetCurrentStepNumber();
-    
-    G4StepPoint* preStep = step->GetPreStepPoint();
-    G4StepPoint* postStep = step->GetPostStepPoint();
 
+    // Check if the particle should be ignored.
+    //
     G4String particle = track->GetParticleDefinition()->GetParticleName();
-    G4String particleType = track->GetParticleDefinition()->GetParticleType();
-    */
-
-    G4String procName = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
-
-    // Collect energy and number of scatters step by step
-    // Don't save the out of world step
-    // if(!postStep->GetPhysicalVolume()) return;
-
-    if( procName=="Transportation" && step->GetTotalEnergyDeposit()<1.e-6*CLHEP::eV )
+    if( fRunAction->ExcludeParticle( particle) ){
         return;
+    }
+
+    // Check if the volume should be ignored.
+    //
+    G4String vol = track->GetVolume()->GetName();
+    if( fRunAction->ExcludeVolume( vol ) ){
+        return;
+    }
+
+    // Maybe check if the process should be ignored.
+    //
+    G4String procName = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+    if( fRunAction->ExcludeProcess( procName ) ){
+        return;
+    }
 
     /*
     // Record only EM interactions.

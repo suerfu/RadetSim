@@ -121,10 +121,14 @@ int main( int argc, char** argv ){
 
 
     // Tracking, stepping and stacking action
+    // Enable them only when output is needed.
+    // This is checked using RunAction's output filename since TTree and TTile are initialized afterwards.
     //
-    runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
-    runManager->SetUserAction( new SteppingAction( runAction, eventAction, detectorConstruction ) );
-    runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
+    if( runAction->GetOutputFileName()!="" ){
+        runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
+        runManager->SetUserAction( new SteppingAction( runAction, eventAction ) );
+        runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
+    }
 
 
     runManager->Initialize();

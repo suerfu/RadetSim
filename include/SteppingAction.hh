@@ -14,24 +14,27 @@
 
 #include "RunAction.hh"
 
+#include <set>
+
 class GeometryConstruction;
 class EventAction;
+
 
 /// Stepping action class.
 ///
 /// In UserSteppingAction() there are collected the energy deposit and track
-/// lengths of charged particles in Absober and Gap layers and
-/// updated in EventAction.
+/// The steps will be processed in EventAction.
 
 class SteppingAction : public G4UserSteppingAction{
 
 public:
 
-    SteppingAction( RunAction* runAction, EventAction* eventAction, const GeometryConstruction* detectorConstruction );
+    SteppingAction( RunAction* runAction, EventAction* eventAction );
 
     virtual ~SteppingAction();
 
     virtual void UserSteppingAction( const G4Step* step );
+        //!< In this method, G4Steps are used to form StepInfo classes and pushed into EventAction's step collector.
 
 private:
 
@@ -39,7 +42,6 @@ private:
 
     EventAction* fEventAction;
 
-    const GeometryConstruction* fDetectorConstruction;
 };
 
 

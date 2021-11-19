@@ -27,12 +27,19 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
     G4double window = 1.e6*CLHEP::ns;
 
     G4String particleName = track->GetDefinition()->GetParticleName();
+
+    // By default, ignore or do not track neutrinos
+    //
     if( particleName=="anti_nu_e" || particleName=="nu_e" ){
         return fKill;
     }
 
-    G4double time = track->GetGlobalTime();
-    if( time<window ){
+    G4String motherProcess = "";
+    if( track->GetCreatorProcess()!=0 ){
+        motherProcess = track->GetCreatorProcess()->GetProcessName();
+    }
+
+    if( motherProcess!="RadioactiveDecay" ){
         return fUrgent;
     }
     else{
@@ -44,6 +51,6 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
 
 void StackingAction::NewStage(){
     StepInfo stepinfo;
-    stepinfo.SetProcessName( "timeReset" );
+    stepinfo.processName = "timeReset";
     fEventAction->GetStepCollection().push_back(stepinfo);
 }

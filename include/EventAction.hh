@@ -16,26 +16,6 @@
 #include "RunAction.hh"
 
 
-/// This structure is simply used to store all the relevant kinetic information in a single place.
-struct KineticInfo{
-
-    double rx;
-    double ry;
-    double rz;
-
-    double px;
-    double py;
-    double pz;
-
-    double Eki;
-    double Ekf;
-    double Edep;
-    
-    double time;
-};
-
-
-
 /// EventAction is responsible for processing the events.
 /// The process mainly includes iterating over the tracks/steps and write them into a ROOT file.
 
@@ -67,12 +47,6 @@ private:
     TTree* data_tree;
         //!< Pointer to a ROOT TTree object.
 
-    // Below various IDs
-    int eventID;
-    int trackID;
-    int parentID;
-    int stepID;
-
     int max_char_len;
         //!< Maximum character length to store in ROOT. Using char[] insteat of string will speed up things.
 
@@ -87,8 +61,8 @@ private:
     G4ThreeVector position;
     G4ThreeVector momentum;
 
-    KineticInfo kineticInfo;
-        //!< Kinetic information to be filled into TTree. The information will be retrieved from the ROOT TTree.
+    StepInfo wStep;
+        //!< StepInfo for writing to ROOT output.
 };
 
 

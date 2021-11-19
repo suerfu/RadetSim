@@ -7,8 +7,8 @@
 /// \file RunAction.hh
 /// \brief Definition of the RunAction class
 
-#ifndef RunAction_h
-#define RunAction_h 1
+#ifndef RUNACTION_H
+#define RUNACTION_H 1
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <sstream>
+#include <set>
 
 #include "utility.hh"
 
@@ -33,27 +34,39 @@ public:
 
     virtual ~RunAction();
 
-    virtual void SetOutputFileName( G4String newname );
+    void SetOutputFileName( G4String newname );
+
+    G4String GetOutputFileName(){ return outputName; }
 
     virtual void BeginOfRunAction( const G4Run* );
+
     virtual void EndOfRunAction( const G4Run* );
 
+    /// Keep a record of the macro used for the run.
     void AddMacro( G4String s){
         macros.push_back( s );
     }
-
-    /*
-    void AddRandomSeeds( long seeds[], int len){
-        for( int i=0; i<len; i++)
-            randomSeeds.push_back( seeds[i]);
-    }
-    */
 
     TTree* GetDataTree();
 
     CommandlineArguments* GetCommandlineArguments();
 
+    void AddRecordWhenHit( G4String a);
+    bool RecordWhenHit( G4String a);
+
+    void AddExcludeParticle( G4String a);
+    bool ExcludeParticle( G4String a);
+
+    void AddExcludeVolume( G4String a);
+    bool ExcludeVolume( G4String a);
+
+    void AddExcludeProcess( G4String a);
+    bool ExcludeProcess( G4String a);
+
+
 private:
+
+    RunActionMessenger* fRunActionMessenger;
 
     CommandlineArguments* fCmdlArgs;
 
@@ -64,6 +77,11 @@ private:
 
     std::vector< G4String > macros;
     std::vector< long > randomSeeds;
+
+    std::set< G4String > recordWhenHit;
+    std::set< G4String > excludeParticle;
+    std::set< G4String > excludeVolume;
+    std::set< G4String > excludeProcess;
 
 };
 
