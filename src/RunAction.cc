@@ -129,7 +129,13 @@ void RunAction::AddRecordWhenHit( G4String a){ recordWhenHit.insert(a); }
 
 
 bool RunAction::RecordWhenHit( G4String s ){
-    return recordWhenHit.find(s)!=recordWhenHit.end();
+    if( recordWhenHit.empty()==true ){
+        return true;
+            // If no volume is specified, record everything.
+    }
+    else{
+        return recordWhenHit.find(s)!=recordWhenHit.end();
+    }
 }
 
 void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
