@@ -34,36 +34,37 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track){
     //
     StepInfo stepInfo;
 
-
     // First check if the particle should be excluded.
     //
-    stepInfo.particleName = track->GetParticleDefinition()->GetParticleName();
-    if( fRunAction->ExcludeParticle( stepInfo.particleName) ){
+    stepInfo.SetParticleName (track->GetParticleDefinition()->GetParticleName() );
+    if( fRunAction->ExcludeParticle( stepInfo.GetParticleName() ) ){
         return;
     }
     
     // Next check for exclude volume
     //
-    stepInfo.volumeName = track->GetVolume()->GetName();
-    if( fRunAction->ExcludeVolume( stepInfo.volumeName) ){
+    stepInfo.SetVolumeName( track->GetVolume()->GetName() );
+    if( fRunAction->ExcludeVolume( stepInfo.GetVolumeName() ) ){
         return;
     }
 
-    stepInfo.eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
-    stepInfo.trackID = track->GetTrackID();
-    stepInfo.stepID =  track->GetCurrentStepNumber();
-    stepInfo.parentID = track->GetParentID();
+    stepInfo.SetEventID( G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() );
+    stepInfo.SetTrackID( track->GetTrackID() );
+    stepInfo.SetStepID( track->GetCurrentStepNumber() );
+    stepInfo.SetParentID( track->GetParentID() );
 
-    stepInfo.volumeCopyNumber = track->GetVolume()->GetCopyNo();
+    stepInfo.SetVolumeName( track->GetVolume()->GetName() );
+    stepInfo.SetNextVolumeName( track->GetVolume()->GetName() );
+    stepInfo.SetVolumeCopyNumber( track->GetVolume()->GetCopyNo() );
 
-    stepInfo.position = track->GetPosition();
-    stepInfo.momentumDir = track->GetMomentumDirection();
-    stepInfo.globalTime = track->GetGlobalTime();
+    stepInfo.SetPosition( track->GetPosition() );
+    stepInfo.SetMomentumDir( track->GetMomentumDirection() );
+    stepInfo.SetGlobalTime( track->GetGlobalTime() );
 
-    stepInfo.Eki = track->GetKineticEnergy();
-    stepInfo.Ekf = track->GetKineticEnergy();
+    stepInfo.SetEki( track->GetKineticEnergy() );
+    stepInfo.SetEkf( track->GetKineticEnergy() );
 
-    stepInfo.processName = procName;
+    stepInfo.SetProcessName( procName );
 
     fEventAction->GetStepCollection().push_back(stepInfo);
 }

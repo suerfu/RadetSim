@@ -32,13 +32,7 @@ StepInfo::StepInfo()
     Ekf(0),
     Edep(0),
     position(0),
-    rx(0),
-    ry(0),
-    rz(0),
     momentumDir(0),
-    px(0),
-    py(0),
-    pz(0),
     globalTime(0),
     processName("")
 {}
@@ -56,13 +50,7 @@ StepInfo::StepInfo( const G4Step* step )
     Ekf(0),
     Edep(0),
     position(0),
-    rx(0),
-    ry(0),
-    rz(0),
     momentumDir(0),
-    px(0),
-    py(0),
-    pz(0),
     globalTime(0),
     processName("")
 {
@@ -75,48 +63,42 @@ StepInfo::StepInfo( const G4Step* step )
 
     // Set various IDs
     //
-    eventID = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
-    trackID = track->GetTrackID();
-    stepID = track->GetCurrentStepNumber();
-    parentID = track->GetParentID();
+    SetEventID( G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID() );
+    SetTrackID( track->GetTrackID() );
+    SetStepID( track->GetCurrentStepNumber() );
+    SetParentID( track->GetParentID() );
 
-    particleName = track->GetParticleDefinition()->GetParticleName();
+    SetParticleName( track->GetParticleDefinition()->GetParticleName() );
+
+    SetVolumeName( preStep->GetPhysicalVolume()->GetName() );
 
     // If postStep is not pointing to any physical volume, set a special flag.
     if(!postStep->GetPhysicalVolume()){
-        volumeName = "OutOfWorld";
-        volumeCopyNumber = 0;
+        SetNextVolumeName( "OutOfWorld" );
+        SetVolumeCopyNumber( 0 );
     }
     else {
-        volumeName = postStep->GetPhysicalVolume()->GetName();
-        volumeCopyNumber = postStep->GetPhysicalVolume()->GetCopyNo();
+        SetNextVolumeName( postStep->GetPhysicalVolume()->GetName() );
+        SetVolumeCopyNumber( postStep->GetPhysicalVolume()->GetCopyNo() );
     }
 
     // Retrieve kinematic information.
     //
-    position = postStep->GetPosition();
-    rx = position.x()/mm;
-    ry = position.y()/mm;
-    rz = position.z()/mm;
+    SetPosition( preStep->GetPosition() );
+    SetMomentumDir(preStep->GetMomentumDirection() );
+    SetGlobalTime( postStep->GetGlobalTime() );
 
-    momentumDir = postStep->GetMomentumDirection();
-    px = position.x();
-    py = position.y();
-    pz = position.z();
-
-    globalTime = postStep->GetGlobalTime()/ns;
-
-    Eki = preStep->GetKineticEnergy()/keV;
-    Ekf = postStep->GetKineticEnergy()/keV;
-    Edep = step->GetTotalEnergyDeposit()/keV;
+    SetEki( preStep->GetKineticEnergy() );
+    SetEkf( postStep->GetKineticEnergy() );
+    SetEdep( step->GetTotalEnergyDeposit() );
 
     // If this is a first step in the series, set process name to be a special flag.
     //
     if(!postStep->GetProcessDefinedStep()){
-        processName = "initStep";
+        SetProcessName( "initStep" );
     } 
     else {
-        processName = postStep->GetProcessDefinedStep()->GetProcessName();
+        SetProcessName( postStep->GetProcessDefinedStep()->GetProcessName() );
     }
 }
 

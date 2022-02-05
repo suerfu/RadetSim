@@ -36,6 +36,8 @@ private:
     G4UIdirectory* fDir;
 
     G4UIcmdWithAString* fCmdIncludeWhenHit;
+    G4UIcmdWithAString* fCmdKillWhenHit;
+
     G4UIcmdWithAString* fCmdExcludeParticle;
     G4UIcmdWithAString* fCmdExcludeVolume;
     G4UIcmdWithAString* fCmdExcludeProcess;

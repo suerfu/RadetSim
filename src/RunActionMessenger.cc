@@ -27,6 +27,11 @@ RunActionMessenger::RunActionMessenger( RunAction* EvAct ) : G4UImessenger(),fRu
     fCmdIncludeWhenHit->SetParameterName( "SensitiveVolume", false );
     fCmdIncludeWhenHit->AvailableForStates(G4State_Idle);
 
+    fCmdKillWhenHit = new G4UIcmdWithAString( (dir+"killWhenHit").c_str(), this );
+    fCmdKillWhenHit->SetGuidance( "Kill the particle trajectory when it hits the specified volume." );
+    fCmdKillWhenHit->SetParameterName( "VolumeName", false );
+    fCmdKillWhenHit->AvailableForStates(G4State_Idle);
+
     fCmdExcludeParticle = new G4UIcmdWithAString( (dir+"excludeParticle").c_str(), this );
     fCmdExcludeParticle->SetGuidance( "Exclude certain particles from track recording." );
     fCmdExcludeParticle->SetParameterName( "ParticleName", false );
@@ -45,7 +50,10 @@ RunActionMessenger::RunActionMessenger( RunAction* EvAct ) : G4UImessenger(),fRu
 
 
 RunActionMessenger::~RunActionMessenger(){
+
   delete fCmdIncludeWhenHit;
+  delete fCmdKillWhenHit;
+
   delete fCmdExcludeParticle;
   delete fCmdExcludeVolume;
   delete fCmdExcludeProcess;
@@ -56,6 +64,9 @@ void RunActionMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
 
     if( command==fCmdIncludeWhenHit ){
         fRunAction->AddRecordWhenHit( newValue);
+    }
+    else if( command==fCmdKillWhenHit ){
+        fRunAction->AddKillWhenHit( newValue);
     }
     else if( command==fCmdExcludeParticle ){
         fRunAction->AddExcludeParticle( newValue );

@@ -28,13 +28,15 @@ EventAction::EventAction( RunAction* runaction ) : G4UserEventAction(), fRunActi
 
     data_tree = 0;
 
-    wStep = StepInfo();
-
     tmp_particleName = "";
     tmp_volumeName = "";
     tmp_processName = "";
 
     max_char_len = 15;
+	particleName[15] = '\0';
+	volumeName[15] = '\0';
+	nextVolumeName[15] = '\0';
+	processName[15] = '\0';
     cmdl = fRunAction->GetCommandlineArguments();
 }
 
@@ -59,33 +61,34 @@ void EventAction::BeginOfEventAction(const G4Event*){
 
             // information about its order in the event/run sequence
             //
-            data_tree->Branch("eventID", &wStep.eventID, "eventID/I");
-            data_tree->Branch("trackID", &wStep.trackID, "trackID/I");
+            data_tree->Branch("eventID", &eventID, "eventID/I");
+            data_tree->Branch("trackID", &trackID, "trackID/I");
 
             // information about its idenity
             //
             data_tree->Branch("particle", particleName, "particle[16]/C");
                 // Strings must be handled indirectly since it should not be filled directly.
                 // If done directly, it becomes a vector of variable length and subsequent reading speed becomes very low.
-            data_tree->Branch("parentID", &wStep.parentID, "parentID/I");
-            data_tree->Branch("stepID", &wStep.stepID, "stepID/I");
+            data_tree->Branch("parentID", &parentID, "parentID/I");
+            data_tree->Branch("stepID", &stepID, "stepID/I");
 
             // geometric information
             //
             data_tree->Branch("volume", volumeName, "volume[16]/C");
-            data_tree->Branch("rx", &wStep.rx, "rx/D");
-            data_tree->Branch("ry", &wStep.ry, "ry/D");
-            data_tree->Branch("rz", &wStep.rz, "rz/D");
-            data_tree->Branch("px", &wStep.px, "px/D");
-            data_tree->Branch("py", &wStep.py, "py/D");
-            data_tree->Branch("pz", &wStep.pz, "pz/D");
+            data_tree->Branch("nextVolume", nextVolumeName, "nextVolume[16]/C");
+            data_tree->Branch("rx", &rx, "rx/D");
+            data_tree->Branch("ry", &ry, "ry/D");
+            data_tree->Branch("rz", &rz, "rz/D");
+            data_tree->Branch("px", &px, "px/D");
+            data_tree->Branch("py", &py, "py/D");
+            data_tree->Branch("pz", &pz, "pz/D");
 
             // dynamic information
             //
-            data_tree->Branch("t", &wStep.globalTime, "t/D");
-            data_tree->Branch("Eki", &wStep.Eki, "Eki/D"); // initial kinetic energy before the step
-            data_tree->Branch("Ekf", &wStep.Ekf, "Ekf/D"); // final kinetic energy after the step
-            data_tree->Branch("Edep", &wStep.Edep, "Edep/D"); // energy deposit calculated by Geant4
+            data_tree->Branch("t", &globalTime, "t/D");
+            data_tree->Branch("Eki", &Eki, "Eki/D"); // initial kinetic energy before the step
+            data_tree->Branch("Ekf", &Ekf, "Ekf/D"); // final kinetic energy after the step
+            data_tree->Branch("Edep", &Edep, "Edep/D"); // energy deposit calculated by Geant4
 
             data_tree->Branch("process", processName, "process[16]/C");
         }
@@ -93,7 +96,7 @@ void EventAction::BeginOfEventAction(const G4Event*){
 
     //At the beginning of the event, insert a special flag.
     StepInfo stepinfo;
-    stepinfo.processName = "newEvent";
+    stepinfo.SetProcessName( "newEvent" );
     GetStepCollection().push_back(stepinfo);
 }
 
@@ -116,29 +119,19 @@ void EventAction::EndOfEventAction(const G4Event* event){
         
         // Some filter criteria goes here.
         for( size_t i=0; i < stepCollection.size(); ++i ){
-            if( fRunAction->RecordWhenHit( stepCollection[i].volumeName ) ){
+            if( fRunAction->RecordWhenHit( stepCollection[i].GetVolumeName() ) ){
                 record = true;
                 break;
             }
         }
         
-
         if( record==true ){
 
-            for( size_t i=0; i < stepCollection.size(); ++i ){
+            for( size_t i=0; i < stepCollection.size()-1; ++i ){
                 
                 // If process name is newEvent or timeReset, it means the end of previous event and one should write all the output.
                 //
-                wStep = stepCollection[i];
-
-                tmp_particleName = stepCollection[i].particleName;
-                tmp_volumeName = stepCollection[i].volumeName;
-                tmp_processName = stepCollection[i].processName;
-
-                strncpy( particleName, tmp_particleName.c_str(), max_char_len);
-                strncpy( processName, tmp_processName.c_str(), max_char_len);
-                strncpy( volumeName, tmp_volumeName.c_str(), max_char_len);
-
+                SetFillValue( stepCollection[i] );
                 data_tree->Fill();
             }
         }

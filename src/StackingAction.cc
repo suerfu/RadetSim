@@ -10,6 +10,7 @@
 
 #include "G4Track.hh"
 #include "G4VProcess.hh"
+#include "G4StackManager.hh"
 
 #include "G4SystemOfUnits.hh"
 
@@ -24,16 +25,25 @@ StackingAction::~StackingAction(){ }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track){
 
-    G4double window = 1.e6*CLHEP::ns;
-
-    G4String particleName = track->GetDefinition()->GetParticleName();
-
     // By default, ignore or do not track neutrinos
     //
+    G4String particleName = track->GetDefinition()->GetParticleName();
     if( particleName=="anti_nu_e" || particleName=="nu_e" ){
         return fKill;
     }
 
+    // If global time is within the window, return urgent regardless of the process:
+    //
+    G4double window = 60*CLHEP::s;
+        // 1-minute window
+
+    G4double time = track->GetGlobalTime();
+    if( time < window ){
+        return fUrgent;
+    }
+
+    // Check if it's a radioactive decay that happened years later.
+    //
     G4String motherProcess = "";
     if( track->GetCreatorProcess()!=0 ){
         motherProcess = track->GetCreatorProcess()->GetProcessName();
@@ -50,7 +60,10 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
 
 
 void StackingAction::NewStage(){
+//    if( stackManager->GetNWaitingTrack()>0 ){
     StepInfo stepinfo;
-    stepinfo.processName = "timeReset";
+    stepinfo.SetProcessName( "timeReset" );
     fEventAction->GetStepCollection().push_back(stepinfo);
+//    }
+
 }

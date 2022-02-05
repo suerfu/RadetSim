@@ -43,8 +43,8 @@ public:
     virtual void EndOfRunAction( const G4Run* );
 
     /// Keep a record of the macro used for the run.
-    void AddMacro( G4String s){
-        macros.push_back( s );
+    void AddMacro( G4String a ){
+        macros.push_back( a );
     }
 
     TTree* GetDataTree();
@@ -63,6 +63,9 @@ public:
     void AddExcludeProcess( G4String a);
     bool ExcludeProcess( G4String a);
 
+    void AddKillWhenHit( G4String a);
+    bool KillWhenHit( G4String a);
+
 
 private:
 
@@ -79,6 +82,8 @@ private:
     std::vector< long > randomSeeds;
 
     std::set< G4String > recordWhenHit;
+    std::set< G4String > killWhenHit;
+
     std::set< G4String > excludeParticle;
     std::set< G4String > excludeVolume;
     std::set< G4String > excludeProcess;

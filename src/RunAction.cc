@@ -138,8 +138,15 @@ bool RunAction::RecordWhenHit( G4String s ){
     }
 }
 
-void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
 
+void RunAction::AddKillWhenHit( G4String a){ killWhenHit.insert(a); }
+
+bool RunAction::KillWhenHit( G4String s ){
+    return killWhenHit.find(s)!=killWhenHit.end();
+}
+
+
+void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
 
 bool RunAction::ExcludeParticle( G4String s){
     return excludeParticle.find(s)!=excludeParticle.end();
@@ -158,4 +165,6 @@ void RunAction::AddExcludeProcess( G4String a){ excludeProcess.insert(a); }
 bool RunAction::ExcludeProcess( G4String s){
     return excludeProcess.find(s)!=excludeProcess.end();
 }
+
+
 
