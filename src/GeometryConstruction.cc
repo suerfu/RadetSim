@@ -81,7 +81,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
     G4LogicalVolume* world_lv = new G4LogicalVolume( world_solid, world_material, world_name+"_lv");
     G4VPhysicalVolume* world_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,0), world_lv, world_name, 0, false, 0,fCheckOverlaps);
 
-    world_lv->SetVisAttributes( G4VisAttributes::Invisible );
+    world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
 
     return world_pv;
 }
