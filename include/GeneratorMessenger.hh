@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -25,15 +25,21 @@ class G4UIdirectory;
 class G4UIcmdWithoutParameter;
 class G4UIcmdWithAString;
 class G4UIcmdWithADouble;
+class G4UIcmdWithAnInteger;
+class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWith3VectorAndUnit;
+class G4UIcmdWithABool;
+
 
 class GeneratorMessenger : public G4UImessenger {
 
 public:
 
-	GeneratorMessenger(GeneratorAction*);
-	virtual ~GeneratorMessenger();
+	GeneratorMessenger( GeneratorAction* );
+	
+    virtual ~GeneratorMessenger();
 
-	virtual void SetNewValue(G4UIcommand*, G4String);
+	virtual void SetNewValue( G4UIcommand*, G4String );
 
 private:
 
@@ -43,11 +49,9 @@ private:
 
 	G4UIcmdWithAString* cmdSetSpectrum;
 
-    G4UIcmdWithoutParameter* cmdSample;
-    G4UIcmdWithoutParameter* cmdSetPosition;
-    G4UIcmdWithoutParameter* cmdSetDir;
-    G4UIcmdWithoutParameter* cmdSetEnergy;
-    G4UIcmdWithoutParameter* cmdSetWall;
+    G4UIcmdWithAString* cmdSetParticle;
+	
+    G4UIcmdWithAString* cmdGPSInMaterial;
 
 };
 

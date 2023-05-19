@@ -25,15 +25,13 @@ GeometryManager* GeometryManager::GetGeometryManager(){
 
 
 GeometryManager::GeometryManager(){
-    material_man = GetMaterialManager();
+    material_manager = GetMaterialManager();
     DefineMaterials();
-
-    configReady = false;
 }
 
 
 GeometryManager::~GeometryManager(){
-    parameters.clear();
+    //parameters.clear();
 }
 
 
@@ -47,6 +45,7 @@ G4VPhysicalVolume* GeometryManager::GetPhysicalVolume( G4String name ){
 }
 
 
+/*
 G4double  GeometryManager::GetDimensions(G4String name){
 	if( dimensions.find(name)==dimensions.end() ){
 		return 0;
@@ -54,6 +53,7 @@ G4double  GeometryManager::GetDimensions(G4String name){
 		return dimensions[name];
 	}
 }
+*/
 
 
 G4NistManager* GeometryManager::GetMaterialManager(){
@@ -62,7 +62,7 @@ G4NistManager* GeometryManager::GetMaterialManager(){
 
 
 G4Material* GeometryManager::GetMaterial(G4String name){
-    return material_man->FindOrBuildMaterial( name );
+    return material_manager->FindOrBuildMaterial( name );
 }
 
 
@@ -132,7 +132,7 @@ void  GeometryManager::DefineMaterials( ){
     // ***********************************
     //
 
-    material_man->FindOrBuildMaterial( "G4_W" );
+    material_manager->FindOrBuildMaterial( "G4_W" );
     materialColor["G4_W"] = G4Color( 0.5, 0.5, 0.9);
 
     G4cout << *( G4Material::GetMaterialTable() ) << G4endl;
@@ -142,3 +142,9 @@ void  GeometryManager::DefineMaterials( ){
 void GeometryManager::GeometryHasBeenModified(){
     G4RunManager::GetRunManager()->GeometryHasBeenModified();
 }
+
+
+void GeometryManager::LoadFile( G4String filename ){
+    G4cout << "Loading parameters from " << filename << G4endl;
+}
+

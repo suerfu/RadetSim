@@ -14,8 +14,6 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
-//#include "G4ThreeVector.hh"
-//#include "G4VPhysicalVolume.hh"
 #include "G4Box.hh"
 #include "G4GeneralParticleSource.hh"
 
@@ -38,34 +36,26 @@ class GeneratorAction : public G4VUserPrimaryGeneratorAction {
 
 public:
 
-    GeneratorAction( RunAction* runAction, GeometryManager* geoManager);
+    GeneratorAction( RunAction* runAction );
 
     virtual ~GeneratorAction();
 
-    virtual void GeneratePrimaries(G4Event* event);
+    virtual void GeneratePrimaries( G4Event* event );
 
     void SetSpectrum( G4String str );
         // used to specify the gamma spectrum from which to sample energy & momentum
 
     void SetParticleName( G4String name );
-    	// used to specigy the particle being simulated
-	// when spectrum is used, particle name information is not available.
+        // used to specigy the particle being simulated
+    	// when spectrum is used, particle name information is not available.
 
-    void Sample( int n = -1 );
-
-    void SetPosition();
-        // sample and set position from the specified ROOT file.
-
-    void SetDirection();
-        // sample and set momentum direction from the specified ROOT file.
-
-    void SetEnergy();
-        // sample and set energy from the specified ROOT file.
+    G4double SetEnergy( double E );
+        // sets the energy by taking care of the unit
+        // ROOT file has unit keV
     
-    void ConfineOnWall();
-        // When this method is called, it is assumed that the primary particle position is on the surface of the wall.
-        // Momentum direction w.r.t normal of the wall has theta and phi as polar and azimuth angle.
-
+    void GPSSetMaterial( G4String materialName );
+        // this function samples particle position based on material instead of volume.
+    
 private:
 
     GeneratorMessenger* primaryGeneratorMessenger;
@@ -82,36 +72,31 @@ private:
 
     bool use_gps;
 
+    bool sample;
+        // if true, particle energy vs angle will be sampled from histogram
+    
+    bool GPSInMaterial;
+        // if true, particles will be generated based on material
+
+    double fCumulativeMaterialVolume;
+        // total mass (actually) corresponding to a certain material
+    
+    std::vector<G4VPhysicalVolume*> fVolumesInMaterial;
+        // this vector contains list of volumes that uses a certain material
+        // this is updated each time the function is invoked.
+
     G4String particle;
 
- 
     TFile* file;
-        // Pointer to the ROOT file.
+        // Pointer to the ROOT file containing 2D histogram.
 
     TH2F* hist2D;
-        // Pointer to the 2D histogram from which energy and angle are sampled.
+        // Pointer to the 2d histogram containing energy vs angle
 
-    G4double E;
-    	// Energy
+    G4double Energy;
+        // Energy
 
-    G4double theta;
-	// polar angle w.r.t. the surface
-
-
-    bool onwall;
-        // Flag variable to denote whether particle position should be independently sampled from world surface.
-        // If true, generator will use theta and phi as w.r.t. the normal direction at the sampled position.
-        // Otherwise, the position and direction in the ROOT file will be used as it is.
-    bool sample;
-        // Flag variable to denote whether particle position and momentum should be sampled from ROOT file.
-
-    G4double wall_x;
-    G4double wall_y;
-    G4double wall_z;
-        // Dimentions of the experimental hall.
-
-    G4Box* world;
-        // Pointer to the experimental hall object. Used to randomly sample surface points.
+    G4double Theta;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

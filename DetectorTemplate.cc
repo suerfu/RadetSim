@@ -77,7 +77,7 @@ int main( int argc, char** argv ){
     // Construct detector geometry
     // GeometryManager is simply a central place to obtain information regarding the geometries and materials used in this program.
     //
-    GeometryManager* geometryManager = new GeometryManager();
+    GeometryManager* geometryManager = GeometryManager::Get();
     GeometryConstruction* detectorConstruction = new GeometryConstruction( geometryManager );
     runManager->SetUserInitialization( detectorConstruction );
 
@@ -108,7 +108,7 @@ int main( int argc, char** argv ){
 
     // Primary generator
     //
-    GeneratorAction* generatorAction = new GeneratorAction( runAction, geometryManager );
+    GeneratorAction* generatorAction = new GeneratorAction( runAction );
     runManager->SetUserAction( generatorAction );
 
 

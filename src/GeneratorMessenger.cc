@@ -12,9 +12,11 @@
 
 #include "GeneratorAction.hh"
 
-GeneratorMessenger::GeneratorMessenger( GeneratorAction* generator )  : G4UImessenger(), primaryGenerator(generator), primaryGeneratorDir(0) {
-
-	primaryGeneratorDir = new G4UIdirectory("/generator/");
+GeneratorMessenger::GeneratorMessenger( GeneratorAction* generator ) : G4UImessenger(){
+    
+    primaryGenerator = generator;
+	
+    primaryGeneratorDir = new G4UIdirectory("/generator/");
 	primaryGeneratorDir->SetGuidance("Generator position, momentum and energy spectrum control.");
 
     cmdGPSInMaterial = new G4UIcmdWithAString( "/generator/setMaterial", this);
@@ -51,7 +53,7 @@ void GeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
         primaryGenerator->SetParticleName( newValue );
     }
 	else if( command == cmdGPSInMaterial ){
-        primaryGenerator->GPSInMaterialSetMaterial( newValue );
+        primaryGenerator->GPSSetMaterial( newValue );
     }
 
 }

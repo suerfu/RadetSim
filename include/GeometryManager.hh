@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -14,6 +14,8 @@
 #include "globals.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "G4NistManager.hh"
+
+#include "G4Color.hh"
 
 using namespace CLHEP;
 
@@ -47,10 +49,18 @@ public:
     G4Material* GetMaterial( G4String name );
 
     void GeometryHasBeenModified();
+	
+    G4int GetGeometryType(){ return fGeometryType; }
+    
+    void  SetGeometryType( int a ){ fGeometryType = a; }
     
     bool CheckOverlaps(){ return fCheckOverlaps;}
         // returns a global flag regarding overlap check
 
+    void LoadFile( G4String );
+        // reads configuration file and stores parameters as name-value pairs
+	
+    void SetVisAttributes();
 
 private:
 
@@ -58,9 +68,12 @@ private:
 
     /// User should define all materials to be used in this function.
     void DefineMaterials();
-	std::map< G4String,  G4Color > materialColor;
+	
+    std::map< G4String,  G4Color > materialColor;
 	
     bool fCheckOverlaps;
+	
+    int  fGeometryType; 
 
 };
 

@@ -11,21 +11,22 @@
 #include "GeneratorMessenger.hh"
 
 #include "G4RunManager.hh"
-//#include "G4Event.hh"
 #include "G4ParticleGun.hh"
-//#include "G4ParticleTable.hh"
-//#include "G4ParticleDefinition.hh"
 #include "G4GeneralParticleSource.hh"
-//#include "G4SystemOfUnits.hh"
-//#include "Randomize.hh"
-//#include "G4ThreeVector.hh"
-//#include "G4RandomDirection.hh"
-//#include "G4IonTable.hh"
+#include "G4SPSPosDistribution.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4VisExtent.hh"
+
+#include "TKey.h"
+
+/// Standard includes
+#include <algorithm>
+#include <sstream>
+#include <iterator>
 
 
 
-GeneratorAction::GeneratorAction( RunAction* runAction ) : G4VUserPrimaryGeneratorAction(),
-    fRunAction( runAction) {
+GeneratorAction::GeneratorAction( RunAction* runAction ) : G4VUserPrimaryGeneratorAction(), fRunAction( runAction) {
     
     fCmdlArgs = fRunAction->GetCommandlineArguments();
 
@@ -79,15 +80,15 @@ void GeneratorAction::SetSpectrum( G4String str ){
     TString T2HF_name;
     TKey *key;
     while( (key=(TKey*)next()) ) {
-     T2HF_name=key->GetName();
+        T2HF_name=key->GetName();
     }
-    h1 = (TH2F*)file->Get(T2HF_name);
+    hist2D = (TH2F*)file->Get(T2HF_name);
 
     sample = true;
 }
 
 
-G4double SetEnergy(G4double E){
+G4double GeneratorAction::SetEnergy( double E ){
     return E * keV;
 }
 
@@ -98,7 +99,7 @@ void GeneratorAction::SetParticleName( G4String str ){
 }
 
 
-void  GeneratorAction::GpsInMaterialSetMaterial( G4String materialName ){
+void GeneratorAction::GPSSetMaterial( G4String materialName ){
     
     fVolumesInMaterial.clear();
         // clear the previous material mass information.
@@ -124,13 +125,15 @@ void  GeneratorAction::GpsInMaterialSetMaterial( G4String materialName ){
         i++;
     }
 
-    if(fVolumesInMaterial.empty()){
+    if( fVolumesInMaterial.empty() ){
         throw std::runtime_error("Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'");
     }
 }
 
 
-// 
+// This function randomly returns a pointer to physical volume 
+// with probability corresponding to the mass of the volume
+//
 G4VPhysicalVolume* GPSInMaterialPickVolume( double CumulativeMaterialVolume,  std::vector<G4VPhysicalVolume*> VolumesInMaterial ) {
 
     // Generate a random variable 
@@ -147,19 +150,13 @@ G4VPhysicalVolume* GPSInMaterialPickVolume( double CumulativeMaterialVolume,  st
 }
 
 
-void GeneratorAction::SetParticleName( G4String str ){
-     particle=str;
-     cout<<"Simulated particle is"<<str<<endl;
-}
-
-
-void GeneratorAction::GeneratePrimaries(G4Event* anEvent){
+void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
     
     if( sample==true ){
-        h1->GetRandom2( E, Theta);
-        //fgun->SetParticleMomentumDirection( SetDirection(surface_index,Theta) );
-        fgun->SetParticleEnergy( SetEnergy(E) );
+        hist2D->GetRandom2( Energy, Theta );
         fgun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle( particle ) );
+        fgun->SetParticleMomentumDirection( G4ThreeVector(0, sin(Theta), cos(Theta)) );
+        fgun->SetParticleEnergy( SetEnergy( Energy ) );
         fgun->GeneratePrimaryVertex( anEvent );
     }
     else if ( GPSInMaterial==true ) {
@@ -184,7 +181,6 @@ void GeneratorAction::GeneratePrimaries(G4Event* anEvent){
         pd->SetHalfZ( (extent.GetZmax()-extent.GetZmin()) / 2. );
 
         fgps->GeneratePrimaryVertex( anEvent );
-
     }
     else{
         fgps->GeneratePrimaryVertex( anEvent );
