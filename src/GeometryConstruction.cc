@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -31,9 +31,7 @@
 
 
 
-GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetectorConstruction(),
-    
-    fGeometryManager( gm ) {
+GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetectorConstruction(), fGeometryManager( gm ) {
 
     fCheckOverlaps = true;
     fDetectorMessenger = new GeometryConstructionMessenger(this);
@@ -107,8 +105,6 @@ void GeometryConstruction::ConstructUserVolumes(){
 }
 
 
-
-
 /*
 G4VIStore* GeometryConstruction::CreateImportanceStore(){
     
@@ -124,5 +120,3 @@ G4VIStore* GeometryConstruction::CreateImportanceStore(){
     return istore;
 }
 */
-
-

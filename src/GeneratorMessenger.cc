@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -17,69 +17,42 @@ GeneratorMessenger::GeneratorMessenger( GeneratorAction* generator )  : G4UImess
 	primaryGeneratorDir = new G4UIdirectory("/generator/");
 	primaryGeneratorDir->SetGuidance("Generator position, momentum and energy spectrum control.");
 
-    cmdSetSpectrum = new G4UIcmdWithAString("/generator/spectrum", this);
-    cmdSetSpectrum->SetGuidance("Set the ROOT file from which to sample position, direction and energy.");
-    cmdSetSpectrum->SetParameterName("foo.root", false);
-    cmdSetSpectrum->AvailableForStates(G4State_PreInit, G4State_Idle);
+    cmdGPSInMaterial = new G4UIcmdWithAString( "/generator/setMaterial", this);
+    cmdGPSInMaterial->SetGuidance( "Set the name of the material to generate particles.");
+    cmdGPSInMaterial->SetParameterName( "world", false);
+    cmdGPSInMaterial->AvailableForStates( G4State_PreInit, G4State_Idle);
 
-    cmdSample = new G4UIcmdWithoutParameter("/generator/sample", this);
-    cmdSample->SetGuidance("Increment the sample event index of the ROOT tree of energy spectrum.");
-    cmdSample->AvailableForStates(G4State_PreInit, G4State_Idle);
+    cmdSetSpectrum = new G4UIcmdWithAString( "/generator/spectrum", this);
+    cmdSetSpectrum->SetGuidance( "Set the ROOT file containing polar angle and energy.");
+    cmdSetSpectrum->SetParameterName( "foo.root", false);
+    cmdSetSpectrum->AvailableForStates( G4State_PreInit, G4State_Idle);
+
+	cmdSetParticle = new G4UIcmdWithAString( "/generator/particle", this);
+	cmdSetParticle->SetGuidance( "Set the name of the particle.");
+	cmdSetParticle->SetParameterName( "gamma", false);
+	cmdSetParticle->AvailableForStates( G4State_PreInit, G4State_Idle);
     
-    cmdSetPosition = new G4UIcmdWithoutParameter("/generator/setPos", this);
-    cmdSetPosition->SetGuidance("Set the position of next primary vertex from ROOT file.");
-    cmdSetPosition->AvailableForStates(G4State_PreInit, G4State_Idle);
-
-    cmdSetDir = new G4UIcmdWithoutParameter("/generator/setDir", this);
-    cmdSetDir->SetGuidance("Set the direction of next primary vertex from ROOT file.");
-    cmdSetDir->AvailableForStates(G4State_PreInit, G4State_Idle);
-
-    cmdSetEnergy = new G4UIcmdWithoutParameter("/generator/setEnergy", this);
-    cmdSetEnergy->SetGuidance("Set the energy of next primary vertex from ROOT file.");
-    cmdSetEnergy->AvailableForStates(G4State_PreInit, G4State_Idle);
-
-    cmdSetWall = new G4UIcmdWithoutParameter("/generator/confineOnWall", this);
-    cmdSetWall->SetGuidance("Assumes the source is on the wall. x,y,z in the ROOT file will be irrelevant and theta and phi will be w.r.t. the normal direction of the surface.");
-    cmdSetWall->AvailableForStates(G4State_PreInit, G4State_Idle);
-
 }
 
 
 GeneratorMessenger::~GeneratorMessenger(){
-
+    delete cmdGPSInMaterial;
     delete cmdSetSpectrum;
-    delete cmdSample;
-    delete cmdSetPosition;
-    delete cmdSetDir;
-    delete cmdSetEnergy;
-    delete cmdSetWall;
+    delete cmdSetParticle;
 }
 
 
 void GeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
 
 	if( command == cmdSetSpectrum )	{
-		primaryGenerator->SetSpectrum( newValue);
+		primaryGenerator->SetSpectrum( newValue );
 	}
-
-    else if( command == cmdSample ){
-        primaryGenerator->Sample();
+    else if( command == cmdSetParticle ){
+        primaryGenerator->SetParticleName( newValue );
+    }
+	else if( command == cmdGPSInMaterial ){
+        primaryGenerator->GPSInMaterialSetMaterial( newValue );
     }
 
-    else if( command == cmdSetPosition ){
-        primaryGenerator->SetPosition();
-    }
-
-    else if( command == cmdSetDir ){
-        primaryGenerator->SetDirection();
-    }
-    /*
-    else if( command == cmdSetWall ){
-        primaryGenerator->ConfineOnWall();
-    }
-    */
-    else if( command == cmdSetEnergy ){
-        primaryGenerator->SetEnergy();
-    }
 }
 

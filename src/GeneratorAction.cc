@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -24,44 +24,32 @@
 
 
 
-GeneratorAction::GeneratorAction( RunAction* runAction, GeometryManager* gManager) : G4VUserPrimaryGeneratorAction(),
-    fRunAction( runAction),
-    fGeometryManager( gManager) {
+GeneratorAction::GeneratorAction( RunAction* runAction ) : G4VUserPrimaryGeneratorAction(),
+    fRunAction( runAction) {
     
     fCmdlArgs = fRunAction->GetCommandlineArguments();
 
     fgun = new G4ParticleGun();
     fgps = new G4GeneralParticleSource();
 
-    //Npostponed = 0;
-    //NDelayed = 0;
-
     file = 0;
-    tree = 0;
-    index = 0;
+    particle = "geantino";
 
-    primaryGeneratorMessenger = new GeneratorMessenger(this);
+    primaryGeneratorMessenger = new GeneratorMessenger( this );
 
-    onwall = false;
-    sample = false;
-
-    wall_x = 11*m;
-    wall_y = 12*m;
-    wall_z = 3.2*m;
-
-    world = 0;
+    fVolumesInMaterial.clear();
+    fCumulativeMaterialVolume = 0;
 }
 
 
 GeneratorAction::~GeneratorAction(){
-    
+
     if( !file==0 ){
         file->Close();
         delete file;
     }
 
     delete primaryGeneratorMessenger;
-    delete world;
 }
 
 
@@ -83,81 +71,123 @@ void GeneratorAction::SetSpectrum( G4String str ){
         return;
     }
 
-    tree = (TTree*)file->Get("events");
+    // Note: the spectrum file should contain only one 2D histogram
+    // The histogram should have energy (in keV) and polar angle (in rad) as x and y coordinates.
+    //
+    TIter next( file->GetListOfKeys() );
 
-    if( tree!=0 ){
-        nentries = tree->GetEntries();
-        tree->SetBranchAddress( "nParticle", &nparticle );
-        tree->SetBranchAddress( "particle", &particle );
-        tree->SetBranchAddress( "x", &x );
-        tree->SetBranchAddress( "y", &y );
-        tree->SetBranchAddress( "z", &z );
-        tree->SetBranchAddress( "px", &px );
-        tree->SetBranchAddress( "py", &py );
-        tree->SetBranchAddress( "pz", &pz );
-        tree->SetBranchAddress( "Eki", &E );
-        /*
-        if( tree->GetListOfBranches()->FindObject("theta") )
-            tree->SetBranchAddress( "theta", &theta );
-        if( tree->GetListOfBranches()->FindObject("theta") )
-            tree->SetBranchAddress( "phi", &phi );
-        */
+    TString T2HF_name;
+    TKey *key;
+    while( (key=(TKey*)next()) ) {
+     T2HF_name=key->GetName();
     }
+    h1 = (TH2F*)file->Get(T2HF_name);
 
     sample = true;
-
 }
 
 
-void GeneratorAction::Sample( int n ){
-    if( n>0 && tree!=0 ){
-        index = n;
+G4double SetEnergy(G4double E){
+    return E * keV;
+}
+
+
+void GeneratorAction::SetParticleName( G4String str ){
+     particle=str;
+     cout<<"Simulated particle is"<<str<<endl;
+}
+
+
+void  GeneratorAction::GpsInMaterialSetMaterial( G4String materialName ){
+    
+    fVolumesInMaterial.clear();
+        // clear the previous material mass information.
+    fCumulativeMaterialVolume = 0;
+        // this variable contains the total mass of the material of concern.
+
+    cout<<"Generator setting material to be " << materialName << endl;
+
+    // Iterate over all physical volumes and add the mass of volumes with matching material.
+    //
+    G4PhysicalVolumeStore *PVStore = G4PhysicalVolumeStore::GetInstance();
+    G4int i = 0;
+    while( i<(G4int)PVStore->size() ){
+
+        G4VPhysicalVolume* pv = (*PVStore)[i];
+
+        if (pv->GetLogicalVolume()->GetMaterial()->GetName() == materialName) {
+            fVolumesInMaterial.push_back(pv);
+                //fCumulativeMaterialVolume+=pv->GetLogicalVolume()->GetSolid()->GetCubicVolume()/CLHEP::cm3;
+            fCumulativeMaterialVolume+=pv->GetLogicalVolume()->GetMass( false, false )/CLHEP::kg;
+        }
+
+        i++;
+    }
+
+    if(fVolumesInMaterial.empty()){
+        throw std::runtime_error("Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'");
     }
 }
 
 
-void GeneratorAction::SetPosition(){
-    fgun->SetParticlePosition( G4ThreeVector(x,y,z) );
+// 
+G4VPhysicalVolume* GPSInMaterialPickVolume( double CumulativeMaterialVolume,  std::vector<G4VPhysicalVolume*> VolumesInMaterial ) {
+
+    // Generate a random variable 
+    G4double r = CLHEP::RandFlat::shoot(0.,CumulativeMaterialVolume);
+    G4int selectedVolume=0;
+    G4double sum=0;
+    do {
+        //sum+=VolumesInMaterial[selectedVolume]->GetLogicalVolume()->GetSolid()->GetCubicVolume()/CLHEP::cm3;
+        sum+=VolumesInMaterial[selectedVolume]->GetLogicalVolume()->GetMass( false, false )/CLHEP::kg;
+        ++selectedVolume;
+    } while(sum<r);
+
+    return VolumesInMaterial[selectedVolume-1];
 }
 
 
-void GeneratorAction::SetDirection(){
-    fgun->SetParticleMomentumDirection( G4ThreeVector(px,py,pz) );
+void GeneratorAction::SetParticleName( G4String str ){
+     particle=str;
+     cout<<"Simulated particle is"<<str<<endl;
 }
-
-
-void GeneratorAction::SetEnergy(){
-    fgun->SetParticleEnergy( E );
-}
-
 
 
 void GeneratorAction::GeneratePrimaries(G4Event* anEvent){
     
     if( sample==true ){
-        tree->GetEntry( index%nentries );
-        int counter = 0;
-        do{
-            fgun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle( particle ) );
-            fgun->SetParticlePosition( G4ThreeVector(x,y,z) );
-            fgun->SetParticleMomentumDirection( G4ThreeVector(px,py,pz) );
-            fgun->SetParticleEnergy( E );
-            fgun->GeneratePrimaryVertex(anEvent);
+        h1->GetRandom2( E, Theta);
+        //fgun->SetParticleMomentumDirection( SetDirection(surface_index,Theta) );
+        fgun->SetParticleEnergy( SetEnergy(E) );
+        fgun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle( particle ) );
+        fgun->GeneratePrimaryVertex( anEvent );
+    }
+    else if ( GPSInMaterial==true ) {
 
-            if( nparticle>1){
-                index++;
-                tree->GetEntry( index%nentries );
-            }
-            else{
-                break;
-            }
-            counter++;
-        }while( counter<nparticle);
+        if( fVolumesInMaterial.empty() ){
+            throw std::runtime_error( "Generator::GPSInMaterial::GeneratePrimaries : no material set");
+        }
 
-        index++;
+        G4VPhysicalVolume* selectedVolume = GPSInMaterialPickVolume( fCumulativeMaterialVolume,  fVolumesInMaterial );
+
+        G4VisExtent extent=selectedVolume->GetLogicalVolume()->GetSolid()->GetExtent();
+
+        G4ThreeVector translationToVolumeCenter( (extent.GetXmax()+extent.GetXmin())/2., (extent.GetYmax()+extent.GetYmin())/2., (extent.GetZmax()+extent.GetZmin())/2. );
+
+        G4SPSPosDistribution* pd= fgps->GetCurrentSource()->GetPosDist();
+        pd->ConfineSourceToVolume( selectedVolume->GetName() );
+        pd->SetPosDisType( "Volume" );
+        pd->SetPosDisShape( "Para" );
+        pd->SetCentreCoords( selectedVolume->GetTranslation() + translationToVolumeCenter );
+        pd->SetHalfX( (extent.GetXmax()-extent.GetXmin()) / 2. );
+        pd->SetHalfY( (extent.GetYmax()-extent.GetYmin()) / 2. );
+        pd->SetHalfZ( (extent.GetZmax()-extent.GetZmin()) / 2. );
+
+        fgps->GeneratePrimaryVertex( anEvent );
+
     }
     else{
-        fgps->GeneratePrimaryVertex(anEvent);
+        fgps->GeneratePrimaryVertex( anEvent );
     }
 }
 

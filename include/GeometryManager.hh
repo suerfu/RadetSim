@@ -17,34 +17,50 @@
 
 using namespace CLHEP;
 
+/// Singleton class.
+/// It manages different attributes of geometry in the simulation/
+/// Asstributes includes dimensions, color, material, mass, etc.
 class GeometryManager{
 
-public:
+private:
 
     GeometryManager();
 
     ~GeometryManager();
 
-    //void Add( G4String name, G4LogicalVolume* log, G4VPhysicalVolume* phys);
+    static GeometryManager* manager;
+
+public:
+    
+    static GeometryManager* GetGeometryManager();
+
+    static GeometryManager* Get();
 
     G4LogicalVolume* GetLogicalVolume( G4String name );
+        // return pointer to logical volume by name
 
     G4VPhysicalVolume* GetPhysicalVolume( G4String name );
+        // return pointer to physical volume by name
 
     G4NistManager* GetMaterialManager();
 
     G4Material* GetMaterial( G4String name );
 
     void GeometryHasBeenModified();
+    
+    bool CheckOverlaps(){ return fCheckOverlaps;}
+        // returns a global flag regarding overlap check
+
 
 private:
 
-    //std::map< G4String, std::pair<G4LogicalVolume*, G4VPhysicalVolume*> > dictionary;
-
-    G4NistManager* material_man;
+    G4NistManager* material_manager;
 
     /// User should define all materials to be used in this function.
     void DefineMaterials();
+	std::map< G4String,  G4Color > materialColor;
+	
+    bool fCheckOverlaps;
 
 };
 

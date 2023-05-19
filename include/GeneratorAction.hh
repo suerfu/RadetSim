@@ -25,6 +25,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TH2F.h"
 
 class G4GeneralParticleSource;
 class G4ParticleGun;
@@ -45,6 +46,10 @@ public:
 
     void SetSpectrum( G4String str );
         // used to specify the gamma spectrum from which to sample energy & momentum
+
+    void SetParticleName( G4String name );
+    	// used to specigy the particle being simulated
+	// when spectrum is used, particle name information is not available.
 
     void Sample( int n = -1 );
 
@@ -77,33 +82,21 @@ private:
 
     bool use_gps;
 
+    G4String particle;
+
+ 
     TFile* file;
         // Pointer to the ROOT file.
 
-    TTree* tree;
-        // Pointer to the TTree object.
+    TH2F* hist2D;
+        // Pointer to the 2D histogram from which energy and angle are sampled.
 
-    int nentries;
-        // No. of entries in the root tree.
-    int index;
-        // Following variables used to read and hold sampled values from the ROOT file.
-    char particle[16];
-        // Name of the particle
-    int nparticle;
-        // No. of particle generated in this event.
-    double x;
-    double y;
-    double z;
-        // Location of the particle
-    double px;
-    double py;
-    double pz;
-        // Momentmum
-    double E;
-        // Energy
-    double theta;
-    double phi;
-        // Polar angle with respect to z direction
+    G4double E;
+    	// Energy
+
+    G4double theta;
+	// polar angle w.r.t. the surface
+
 
     bool onwall;
         // Flag variable to denote whether particle position should be independently sampled from world surface.
