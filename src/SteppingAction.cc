@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -39,6 +39,16 @@ void SteppingAction::UserSteppingAction( const G4Step* step){
         return;
     }
 
+	// Check if the particle should be killed
+	// This applies e.g. to cut long decay chains.
+	// ExcludeParticle will exclude from recording, but will not kill the particle.
+	//
+    if( fRunAction->KillParticle( particle) ){
+        track->SetTrackStatus( fStopAndKill );
+        return;
+    }
+
+
     // Check if the volume should be ignored.
     //
     G4String vol = track->GetVolume()->GetName();
@@ -70,8 +80,6 @@ void SteppingAction::UserSteppingAction( const G4Step* step){
             track->SetTrackStatus( fStopAndKill );
         }
     }
-    
-
 
 }
 

@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -37,6 +37,11 @@ RunActionMessenger::RunActionMessenger( RunAction* EvAct ) : G4UImessenger(),fRu
     fCmdExcludeParticle->SetParameterName( "ParticleName", false );
     fCmdExcludeParticle->AvailableForStates(G4State_Idle);
 
+	fCmdKillParticle = new G4UIcmdWithAString( (dir+"killParticle").c_str(), this );
+    fCmdKillParticle->SetGuidance( "Kill certain particles from simulation. Useful in cutting long decay chains." );
+    fCmdKillParticle->SetParameterName( "ParticleName", false );
+    fCmdKillParticle->AvailableForStates(G4State_Idle);
+
     fCmdExcludeVolume = new G4UIcmdWithAString( (dir+"excludeVolume").c_str(), this );
     fCmdExcludeVolume->SetGuidance( "Record the track when a particle hits a particular volume." );
     fCmdExcludeVolume->SetParameterName( "SensitiveVolume", false );
@@ -55,6 +60,7 @@ RunActionMessenger::~RunActionMessenger(){
   delete fCmdKillWhenHit;
 
   delete fCmdExcludeParticle;
+  delete fCmdKillParticle;
   delete fCmdExcludeVolume;
   delete fCmdExcludeProcess;
 }
@@ -71,7 +77,10 @@ void RunActionMessenger::SetNewValue(G4UIcommand* command, G4String newValue){
     else if( command==fCmdExcludeParticle ){
         fRunAction->AddExcludeParticle( newValue );
     }
-    else if( command==fCmdExcludeVolume ){
+    else if( command==fCmdKillParticle ){
+        fRunAction->AddKillParticle( newValue );
+    }
+     else if( command==fCmdExcludeVolume ){
         fRunAction->AddExcludeVolume( newValue );
     }
     else if( command==fCmdExcludeProcess ){

@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -39,6 +39,7 @@ private:
     G4UIcmdWithAString* fCmdKillWhenHit;
 
     G4UIcmdWithAString* fCmdExcludeParticle;
+    G4UIcmdWithAString* fCmdKillParticle;
     G4UIcmdWithAString* fCmdExcludeVolume;
     G4UIcmdWithAString* fCmdExcludeProcess;
 

@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -20,8 +20,7 @@
 #include "TTree.h"
 
 
-RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(),
-     fRunActionMessenger(0), fCmdlArgs( c ){
+RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(), fRunActionMessenger(0), fCmdlArgs( c ){
 
     fRunActionMessenger = new RunActionMessenger( this );
 
@@ -49,7 +48,6 @@ RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(),
     randomSeeds.push_back( seeds[1] );
 
     G4cout << "Seeds for random generator are " << seeds[0] << ", " << seeds[1] << G4endl;
-
 
     // Configure output
     //
@@ -151,6 +149,14 @@ void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
 bool RunAction::ExcludeParticle( G4String s){
     return excludeParticle.find(s)!=excludeParticle.end();
 }
+
+
+void RunAction::AddKillParticle( G4String a){ killParticle.insert(a); }
+
+bool RunAction::KillParticle( G4String s){
+    return killParticle.find(s)!=killParticle.end();
+}
+
 
 
 void RunAction::AddExcludeVolume( G4String a){ excludeVolume.insert(a); }

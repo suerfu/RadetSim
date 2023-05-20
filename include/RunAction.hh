@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -57,6 +57,9 @@ public:
     void AddExcludeParticle( G4String a);
     bool ExcludeParticle( G4String a);
 
+	void AddKillParticle( G4String a);
+    bool KillParticle( G4String a);
+
     void AddExcludeVolume( G4String a);
     bool ExcludeVolume( G4String a);
 
@@ -85,6 +88,7 @@ private:
     std::set< G4String > killWhenHit;
 
     std::set< G4String > excludeParticle;
+    std::set< G4String > killParticle;
     std::set< G4String > excludeVolume;
     std::set< G4String > excludeProcess;
 
