@@ -15,6 +15,7 @@
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4PhysicalVolumeStore.hh"
 
 #include "TFile.h"
 #include "TTree.h"

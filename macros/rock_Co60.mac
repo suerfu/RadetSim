@@ -24,7 +24,7 @@
 #/generator/spectrum config/generator/rockGammaK40.root
 #/generator/particle gamma
 
-/generator/setMaterial Rock_SURF
+/generator/setMaterial Rock
 
 #Using gps
 /gps/particle ion
@@ -32,4 +32,4 @@
 /gps/energy 0 keV
 
 /run/printProgress 10000
-/run/beamOn 100000
+/run/beamOn 100
