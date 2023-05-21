@@ -19,7 +19,7 @@
 
 #include "TKey.h"
 
-/// Standard includes
+// Standard includes
 #include <algorithm>
 #include <sstream>
 #include <iterator>
@@ -36,7 +36,9 @@ GeneratorAction::GeneratorAction( RunAction* runAction ) : G4VUserPrimaryGenerat
     file = 0;
     particle = "geantino";
 
-    use_gps = true;
+    useGPS = true;
+	GPSInMaterial = false;
+		// default values.
 
     primaryGeneratorMessenger = new GeneratorMessenger( this );
 
@@ -86,10 +88,14 @@ void GeneratorAction::SetSpectrum( G4String str ){
     }
     hist2D = (TH2F*)file->Get(T2HF_name);
 
-    use_gps = false;
+	// When this function is called, particle gun should be used instead of GPS
+	// set the corresponding flag variable.
+    useGPS = false;
 }
 
 
+// Set the energy from the histogram to have the correct unit.
+//
 G4double GeneratorAction::SetEnergy( double E ){
     return E * keV;
 }
@@ -101,6 +107,8 @@ void GeneratorAction::SetParticleName( G4String str ){
 }
 
 
+// Specify the material in which to generate particles (mainly radioactive decays)
+// 
 void GeneratorAction::GPSSetMaterial( G4String materialName ){
     
     fVolumesInMaterial.clear();
@@ -115,7 +123,6 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     G4PhysicalVolumeStore *PVStore = G4PhysicalVolumeStore::GetInstance();
     
     G4int i = 0;
-
     while( i<(G4int)PVStore->size() ){
 
         G4VPhysicalVolume* pv = (*PVStore)[i];
@@ -133,7 +140,8 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
         throw std::runtime_error("Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'");
     }
 
-    use_gps = true;
+	// Set the correct flags.
+    useGPS = true;
     GPSInMaterial = true;
 }
 
@@ -159,14 +167,18 @@ G4VPhysicalVolume* GPSInMaterialPickVolume( double CumulativeMaterialVolume,  st
 
 void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
     
-    if( use_gps == false ){
+	// If using particle gun, sample E and theta from the spectrum
+	//
+    if( useGPS == false ){
         hist2D->GetRandom2( Energy, Theta );
         fgun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle( particle ) );
         fgun->SetParticleMomentumDirection( G4ThreeVector(0, sin(Theta), cos(Theta)) );
         fgun->SetParticleEnergy( SetEnergy( Energy ) );
         fgun->GeneratePrimaryVertex( anEvent );
     }
-    else if ( GPSInMaterial==true ) {
+	// Otherwise, if in material, get the source
+	//
+    else if ( useGPS == true && GPSInMaterial == true ) {
 
         if( fVolumesInMaterial.empty() ){
             throw std::runtime_error( "Generator::GPSInMaterial::GeneratePrimaries : no material set");
@@ -189,6 +201,8 @@ void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
 
         fgps->GeneratePrimaryVertex( anEvent );
     }
+	// in this case, user will be setting everything from macros.
+	//
     else{
         fgps->GeneratePrimaryVertex( anEvent );
     }

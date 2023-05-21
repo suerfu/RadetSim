@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -43,15 +43,17 @@ public:
     virtual void GeneratePrimaries( G4Event* event );
 
     void SetSpectrum( G4String str );
-        // used to specify the gamma spectrum from which to sample energy & momentum
+        // used to specify the gamma spectrum 
+		// from which to sample energy & momentum
 
     void SetParticleName( G4String name );
         // used to specigy the particle being simulated
     	// when spectrum is used, particle name information is not available.
+		// Note: this function may be redundent with /gun/particle command.
 
     G4double SetEnergy( double E );
         // sets the energy by taking care of the unit
-        // ROOT file has unit keV
+        // ROOT spectrum file has unit keV
     
     void GPSSetMaterial( G4String materialName );
         // this function samples particle position based on material instead of volume.
@@ -67,10 +69,12 @@ private:
     GeometryManager* fGeometryManager;
 
     G4ParticleGun*  fgun;
+		// used when energy and direction is obtained from a histogram.
 
     G4GeneralParticleSource*  fgps;
+		// more convenient in general cases
 
-    bool use_gps;
+    bool useGPS;
         // true => use GPS to generate events
         // false => use particle gun
     
@@ -85,6 +89,7 @@ private:
         // this is updated each time the function is invoked.
 
     G4String particle;
+		// name of particle being simulated.
 
     TFile* file;
         // Pointer to the ROOT file containing 2D histogram.
@@ -96,6 +101,7 @@ private:
         // Energy
 
     G4double Theta;
+		// polar angle w.r.t. a surface
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
