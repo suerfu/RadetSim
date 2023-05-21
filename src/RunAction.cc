@@ -22,6 +22,11 @@
 
 RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(), fRunActionMessenger(0), fCmdlArgs( c ){
 
+    version = "1.0.1";
+        // Version number. Do not change.
+        // Backward compatible should increment minor number
+        // Bug fixes should increment patch number
+
     fRunActionMessenger = new RunActionMessenger( this );
 
     // Configure the random engine.
@@ -63,7 +68,52 @@ RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(), fRunActionMe
 }
 
 
-RunAction::~RunAction(){}
+RunAction::~RunAction(){
+
+    // Moved from EndOfRun so that multiple runs can be recorded in a single file.
+    //
+    if( outputFile!=0 ) {
+
+        TMacro ver( "version" );
+        ver.AddLine( version.c_str() );
+        ver.Write();
+
+        // Write the macro used in this run as a ROOT macro
+        //
+        for( unsigned int i=0; i<macros.size(); i++){
+            TMacro mac( "runMacro" );
+            mac.ReadFile( macros[i] );
+            mac.Write();    
+        }
+
+        std::stringstream ss;
+        for( unsigned int i=0; i<randomSeeds.size(); i++)
+            ss << randomSeeds[i] << '\t';
+
+        // Also record the random seeds used in this run as a separate TMacro.
+        //
+        TMacro randm( "randomSeeds");
+        randm.AddLine( ss.str().c_str());
+        randm.Write();
+
+        // New since April 28, 2022
+        // Record the material table as well.
+        //
+        TMacro geomTable( "geometryTable");
+
+        // Iterate over the vector of stored physical volumes and get their material & mass.
+        auto volumeStore = G4PhysicalVolumeStore::GetInstance();
+        for( auto itr = volumeStore->begin(); itr!=volumeStore->end(); itr++){
+            ss.str( std::string() ); // clear the string stream
+            ss << (*itr)->GetName() << ' ' << (*itr)->GetLogicalVolume()->GetMass( false, false )/CLHEP::kg << ' ' << (*itr)->GetLogicalVolume()->GetMaterial()->GetName();
+            geomTable.AddLine( ss.str().c_str() );
+        }
+        geomTable.Write();
+
+        outputFile->Write();
+        outputFile->Close();
+    }
+}
 
 
 CommandlineArguments* RunAction::GetCommandlineArguments(){
@@ -80,7 +130,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/){
 
     // If output name is specified, create a ROOT file and a TTree.
     //
-    if( outputName!="" ){
+    if( outputName!="" && outputFile==0 ){
 
         outputFile = new TFile(outputName, "NEW");
         G4cout << "ROOT file " << outputName << " created." << G4endl;
@@ -94,27 +144,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/){
 
 
 
-void RunAction::EndOfRunAction(const G4Run* /*run*/){
-
-    if( outputFile!=0 ) {
-
-        for( unsigned int i=0; i<macros.size(); i++){
-            TMacro mac( macros[i] );
-            mac.Write();    
-        }
-
-        std::stringstream ss;
-        for( unsigned int i=0; i<randomSeeds.size(); i++)
-            ss << randomSeeds[i] << '\t';
-
-        TMacro randm( "randomSeeds");
-        randm.AddLine( ss.str().c_str());
-        randm.Write();
-
-        outputFile->Write();
-        outputFile->Close();
-    }
-}
+void RunAction::EndOfRunAction(const G4Run* /*run*/){}
 
 
 
@@ -126,28 +156,28 @@ TTree* RunAction::GetDataTree(){
 void RunAction::AddRecordWhenHit( G4String a){ recordWhenHit.insert(a); }
 
 
-bool RunAction::RecordWhenHit( G4String s ){
+bool RunAction::RecordWhenHit( G4String a ){
     if( recordWhenHit.empty()==true ){
         return true;
             // If no volume is specified, record everything.
     }
     else{
-        return recordWhenHit.find(s)!=recordWhenHit.end();
+        return recordWhenHit.find( a )!=recordWhenHit.end();
     }
 }
 
 
 void RunAction::AddKillWhenHit( G4String a){ killWhenHit.insert(a); }
 
-bool RunAction::KillWhenHit( G4String s ){
-    return killWhenHit.find(s)!=killWhenHit.end();
+bool RunAction::KillWhenHit( G4String a ){
+    return killWhenHit.find( a )!=killWhenHit.end();
 }
 
 
 void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
 
-bool RunAction::ExcludeParticle( G4String s){
-    return excludeParticle.find(s)!=excludeParticle.end();
+bool RunAction::ExcludeParticle( G4String a ){
+    return excludeParticle.find( a )!=excludeParticle.end();
 }
 
 
@@ -161,16 +191,13 @@ bool RunAction::KillParticle( G4String s){
 
 void RunAction::AddExcludeVolume( G4String a){ excludeVolume.insert(a); }
 
-bool RunAction::ExcludeVolume( G4String s){
-    return excludeVolume.find(s)!=excludeVolume.end();
+bool RunAction::ExcludeVolume( G4String a ){
+    return excludeVolume.find( a )!=excludeVolume.end();
 }
 
 
 void RunAction::AddExcludeProcess( G4String a){ excludeProcess.insert(a); }
 
-bool RunAction::ExcludeProcess( G4String s){
-    return excludeProcess.find(s)!=excludeProcess.end();
+bool RunAction::ExcludeProcess( G4String a ){
+    return excludeProcess.find( a )!=excludeProcess.end();
 }
-
-
-
