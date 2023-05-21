@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -122,11 +122,11 @@ int main( int argc, char** argv ){
     // Enable them only when output is needed.
     // This is checked using RunAction's output filename since TTree and TTile are initialized afterwards.
     //
-    if( runAction->GetOutputFileName()!="" ){
-        runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
-        runManager->SetUserAction( new SteppingAction( runAction, eventAction ) );
-        runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
-    }
+    //if( runAction->GetOutputFileName()!="" ){
+    runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
+    runManager->SetUserAction( new SteppingAction( runAction, eventAction ) );
+    runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
+    //}
 
 
     runManager->Initialize();
@@ -189,7 +189,7 @@ int main( int argc, char** argv ){
 void PrintUsage() {
     G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
     G4cerr << "\t-m/--macro,       used to specify the macro file to execute.\n";
-    G4cerr << "\t-u/--interactive, enter interactive session.\n";
+    G4cerr << "\t-u/--interactive, enter interactive session. In this case, do not use -m/--macro\n";
     G4cerr << "\t--vis,            enable visualization. (disabled by default)\n";
     G4cerr << "\t--seed,           the random seed to be used. (default current time)\n";
     G4cerr << "\t-o/--output       specify the output file name to which trajectories will be recorded.\n";

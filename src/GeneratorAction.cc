@@ -36,6 +36,8 @@ GeneratorAction::GeneratorAction( RunAction* runAction ) : G4VUserPrimaryGenerat
     file = 0;
     particle = "geantino";
 
+    use_gps = true;
+
     primaryGeneratorMessenger = new GeneratorMessenger( this );
 
     fVolumesInMaterial.clear();
@@ -84,7 +86,7 @@ void GeneratorAction::SetSpectrum( G4String str ){
     }
     hist2D = (TH2F*)file->Get(T2HF_name);
 
-    sample = true;
+    use_gps = false;
 }
 
 
@@ -94,8 +96,8 @@ G4double GeneratorAction::SetEnergy( double E ){
 
 
 void GeneratorAction::SetParticleName( G4String str ){
-     particle=str;
-     cout<<"Simulated particle is"<<str<<endl;
+     particle = str;
+     cout << "Simulated particle is" << str << endl;
 }
 
 
@@ -111,7 +113,9 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     // Iterate over all physical volumes and add the mass of volumes with matching material.
     //
     G4PhysicalVolumeStore *PVStore = G4PhysicalVolumeStore::GetInstance();
+    
     G4int i = 0;
+
     while( i<(G4int)PVStore->size() ){
 
         G4VPhysicalVolume* pv = (*PVStore)[i];
@@ -128,6 +132,9 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     if( fVolumesInMaterial.empty() ){
         throw std::runtime_error("Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'");
     }
+
+    use_gps = true;
+    GPSInMaterial = true;
 }
 
 
@@ -152,7 +159,7 @@ G4VPhysicalVolume* GPSInMaterialPickVolume( double CumulativeMaterialVolume,  st
 
 void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
     
-    if( sample==true ){
+    if( use_gps == false ){
         hist2D->GetRandom2( Energy, Theta );
         fgun->SetParticleDefinition( G4ParticleTable::GetParticleTable()->FindParticle( particle ) );
         fgun->SetParticleMomentumDirection( G4ThreeVector(0, sin(Theta), cos(Theta)) );

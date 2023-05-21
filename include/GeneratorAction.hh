@@ -71,9 +71,8 @@ private:
     G4GeneralParticleSource*  fgps;
 
     bool use_gps;
-
-    bool sample;
-        // if true, particle energy vs angle will be sampled from histogram
+        // true => use GPS to generate events
+        // false => use particle gun
     
     bool GPSInMaterial;
         // if true, particles will be generated based on material

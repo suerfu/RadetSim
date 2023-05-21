@@ -87,6 +87,23 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 
 void GeometryConstruction::ConstructUserVolumes(){
 
+
+    G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock_SURF" );
+
+    G4LogicalVolume* world_lv = GeometryManager::Get()->GetLogicalVolume("world");
+
+    G4Box* rock_solid = new G4Box( "rock_solid", world_x/2.0, world_y/2.0, world_z/4.0);
+    G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, "rock_lv");
+    G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "rockKamioka", world_lv, false, 0, fCheckOverlaps);
+
+    G4Material* virtualDetMaterial = GeometryManager::Get()->GetMaterial( "G4_Galactic" );
+
+    G4Box* det_solid = new G4Box( "virtualDetector_solid", world_x/2.0, world_y/2.0, world_z/4.0);
+    G4LogicalVolume* det_lv = new G4LogicalVolume( det_solid, virtualDetMaterial, "virtualDetector_lv");
+    G4VPhysicalVolume* det_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,world_z/4), det_lv, "virtualDetector", world_lv, false, 0, fCheckOverlaps);
+
+
+/*
     simple_cube->Construct();
 
     const int Nfs = 6;
@@ -101,7 +118,7 @@ void GeometryConstruction::ConstructUserVolumes(){
         G4ThreeVector pos( distance*cos(angle), distance*sin(angle),0 );
         fs[i] -> PlaceDetector( name.str(), pos );
     }
-
+*/
 }
 
 
