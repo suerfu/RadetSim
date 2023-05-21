@@ -247,7 +247,7 @@ void  GeometryManager::DefineMaterials( ){
 	fraction = 0.0096;
     fracM = 12.011 / ( 12.011 + 2*15.999 );
     fracM_O += (1-fracM)*fraction;
-    rock->AddElement( elH, fracM * fraction );
+    rock->AddElement( elC, fracM * fraction );
     
 	// ============ S ==============
 	fraction = 0.0001;
