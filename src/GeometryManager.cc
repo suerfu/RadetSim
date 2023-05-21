@@ -149,7 +149,7 @@ void  GeometryManager::DefineMaterials( ){
     
     G4int nComponents;
 
-    G4Material* rock = new G4Material("Rock_SURF", density= 3.26*g/cm3, nComponents = 12);
+    G4Material* rock = new G4Material("Rock", density= 3.26*g/cm3, nComponents = 12);
         // The density for Homestake formation is taken from:
         //      https://sdaos.org/wp-content/uploads/pdfs/2014/roggenthen%2033-41.pdf
         // The chemical composition is taken from:

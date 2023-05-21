@@ -88,13 +88,13 @@ G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 void GeometryConstruction::ConstructUserVolumes(){
 
 
-    G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock_SURF" );
+    G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock" );
 
     G4LogicalVolume* world_lv = GeometryManager::Get()->GetLogicalVolume("world");
 
     G4Box* rock_solid = new G4Box( "rock_solid", world_x/2.0, world_y/2.0, world_z/4.0);
     G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, "rock_lv");
-    G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "rockKamioka", world_lv, false, 0, fCheckOverlaps);
+    G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "rock", world_lv, false, 0, fCheckOverlaps);
 
     G4Material* virtualDetMaterial = GeometryManager::Get()->GetMaterial( "G4_Galactic" );
 
