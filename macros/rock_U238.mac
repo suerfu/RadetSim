@@ -1,0 +1,35 @@
+# Macro file for the initialization
+# in interactive session
+
+# Set geometry
+#/geometry/type 0
+#/geometry/construct
+
+# Initialize kernel
+/run/initialize
+/tracking/verbose 0
+
+#/control/getEnv a
+#/control/getEnv b
+#/random/setSeeds {a} {b}
+
+# some custom filter-related commands:
+
+/filter/recordWhenHit virtualDetector
+/filter/killWhenHit virtualDetector
+#/filter/killParticle Pb208
+
+# some custom generator-related commands:
+
+#/generator/spectrum config/generator/rockGammaK40.root
+#/generator/particle gamma
+
+/generator/setMaterial Rock
+
+#Using gps
+/gps/particle ion
+/gps/ion 92 238
+/gps/energy 0 keV
+
+/run/printProgress 10000
+/run/beamOn 100000000
