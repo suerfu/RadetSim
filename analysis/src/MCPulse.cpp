@@ -1,6 +1,6 @@
 
 #include "MCPulse.h"
-
+#include <cstring>
 
 MCPulse::MCPulse(){
     time = -1;
@@ -78,3 +78,40 @@ ostream& operator<<( ostream& os, const MCPulse& a){
 	return os;
 }
 
+
+int MCPulse::GetEdepIndex( string name ){
+
+    if( name=="e-" || name=="e+" || name=="gamma" ){
+        return 0;
+    }
+    else if( IsNuclearRecoil( name ) ){
+        return 1;
+    }
+    else{
+        return 2;
+    }
+}
+
+
+bool MCPulse::IsNuclearRecoil( string name ){
+    
+    // first check if starts with capital letter
+    // if so, it is Geant4's isotope notation
+    if( isupper(name[0]) )
+        return true;
+    
+    // next check for a few exceptions
+    // including proton, neutron, deuteron, alpha, triton
+    if( name.find("proton")!=string::npos )
+        return true;
+    if( name.find("neutron")!=string::npos )
+        return true;
+    if( name.find("deuteron")!=string::npos )
+        return true;
+    if( name.find("triton")!=string::npos )
+        return true;
+    if( name.find("alpha")!=string::npos)
+        return true;
+
+    return false;
+}

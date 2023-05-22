@@ -10,6 +10,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TMacro.h"
 
 using namespace std;
 
@@ -48,9 +49,19 @@ public:
     // Process the tracks in input and write output as a ROOT TTree in output.
     void Process( string output, vector<string> inputs );
 
+    // Get duration of simulation in seconds
+    double GetTimeSimulated( TMacro run, TMacro geo );
+
+    // Get the number of particle simulated in this run
+    double GetNbParticleSimulated( TMacro mac );
+
+    // Returns the total mass based on material
+    double GetMassByMaterial( TMacro macro, string name );
+
+
 private:
 
-    static const unsigned int MAX_FILENAME_LEN = 64;
+    static const unsigned int MAX_FILENAME_LEN = 128;
 
     double daqWindow;
     double coinWindow;
@@ -61,7 +72,7 @@ private:
         // This array holds the volumes of interest.
         // If it's zero, will treat all volumes as volume of interest.
 
-    vector<string> GetVOIFromFile( vector<string> inputName){}
+    vector<string> GetVOIFromFile( vector<string> inputName);
         // Iterate through given files to generate a list of volumes involved.
 
 
@@ -69,9 +80,12 @@ private:
 
     // Set branch variables to the default values.
     void DefaultBranchVariables(){
-        map<string, double>::iterator itr;
-        for( itr = energyDeposit.begin(); itr!=energyDeposit.end(); itr++ ){
-            itr->second = 0;
+        //map<string, double>::iterator itr;
+        for( auto itr = energyDeposit.begin(); itr!=energyDeposit.end(); itr++ ){
+            double* dptr = itr->second;
+            for( unsigned int i=0; i<MCPulse::GetNType(); i++){
+                dptr[i] = 0;
+            }
         }
         timeStamp = -1;
     }
@@ -87,7 +101,21 @@ private:
     double timeStamp;
         // timeStamp of the interaction.
 
-    map<string, double> energyDeposit;
+    // Function to retrieve TMacro from the output file so that subsequent inputs are macros.
+    TMacro GetMacro( string file, string name);
+
+    double Nsimulated;
+        // Total No. of particles simulated in this run
+
+    double Tsimulated;
+        // Total days simulated.
+        // Assuming 1 Bq/kg for internal radioactivity
+        // or 1 /m2/s for external gamma/neutron
+        // Internal:
+        //  If there is material/geometry table, use the correct mass.
+        //  If not, assume mass is 1 kg.
+
+    map<string, double*> energyDeposit;
 
     void ProcessFile( TTree* tree, string s);
 
