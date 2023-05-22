@@ -91,17 +91,41 @@ void GeometryConstruction::ConstructUserVolumes(){
     G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock" );
 
     G4LogicalVolume* world_lv = GeometryManager::Get()->GetLogicalVolume("world");
-
+    
+    // Rock extending half of the world
+    //
     G4Box* rock_solid = new G4Box( "rock_solid", world_x/2.0, world_y/2.0, world_z/4.0);
     G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, "rock_lv");
     G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "rock", world_lv, false, 0, fCheckOverlaps);
 
-    G4Material* virtualDetMaterial = GeometryManager::Get()->GetMaterial( "G4_Galactic" );
+    // Lead shielding
+    //
+    G4double Pb_x = 30 * cm;
+    G4double Pb_y = 30 * cm;
+    G4double Pb_z = 50 * cm;
+    G4Box* Pb_solid = new G4Box( "Pb_solid", Pb_x/2.0, Pb_y/2.0, Pb_z/2.0);
 
-    G4Box* det_solid = new G4Box( "virtualDetector_solid", world_x/2.0, world_y/2.0, world_z/4.0);
-    G4LogicalVolume* det_lv = new G4LogicalVolume( det_solid, virtualDetMaterial, "virtualDetector_lv");
-    G4VPhysicalVolume* det_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,world_z/4), det_lv, "virtualDetector", world_lv, false, 0, fCheckOverlaps);
+    // Shielding inner space
+    //
+    G4double Air_x = 10 * cm;
+    G4double Air_y = 10 * cm;
+    G4double Air_z = 30 * cm;
+    G4Box* air_solid = new G4Box( "air_solid", Air_x/2.0, Air_y/2.0, Air_z/2.0);
 
+    G4VSolid* shielding_solid = new G4SubtractionSolid( "shielding_solid", Pb_solid, air_solid, 0, G4ThreeVector(0,0,-Pb_z/2+Air_z/2));
+
+    G4Material* shieldingMaterial = GeometryManager::Get()->GetMaterial( "G4_Pb" );
+    G4LogicalVolume* shielding_lv = new G4LogicalVolume( shielding_solid, shieldingMaterial, "shielding_lv");
+    G4VPhysicalVolume* shielding_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,Pb_z/2), shielding_lv, "Shielding", world_lv, false, 0, fCheckOverlaps);
+
+    // NaI detector
+    //
+    G4double diameter = 1.5 * 2.54 * cm;
+    G4double height = diameter;
+    G4Tubs* NaI_solid = new G4Tubs( "NaI_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
+    G4Material* NaIMaterial = GeometryManager::Get()->GetMaterial( "NaI" );
+    G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, "NaI_lv" );
+    new G4PVPlacement( 0, G4ThreeVector(0,0,height/2), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
 
 /*
     simple_cube->Construct();
