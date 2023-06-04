@@ -477,32 +477,32 @@ double TrackReader::GetTimeSimulated( TMacro runMacro, TMacro geoMacro ){
     cout << NbParticle << " particles simulated" << endl;
 
     // First check if this is a surface type simulation or bulk type simulation.
-    string keyword( "/generator/wall" );
+    string keyword1( "/generator/wall" );
     string keyword2( "/confine" );
-    string keyword3( "/GpsInMaterialBuild/setMaterial" );
+    string keyword3( "/generator/setMaterial" );
 
-    if( runMacro.GetLineWith( keyword.c_str() ) != 0 ){
+    if( runMacro.GetLineWith( keyword1.c_str() ) != 0 ){
 
-        string target( runMacro.GetLineWith( keyword.c_str() )->String().Data() );
+        string target( runMacro.GetLineWith( keyword1.c_str() )->String().Data() );
 
         string foo;
         double xLen, yLen, zLen;
         string xUnit, yUnit, zUnit;
 
-        stringstream ss(  runMacro.GetLineWith( (keyword+"_x").c_str() )->String().Data() );
+        stringstream ss(  runMacro.GetLineWith( (keyword1+"_x").c_str() )->String().Data() );
         ss >> foo >> xLen >> xUnit;
         if( xUnit == "cm" ){
             xLen *= 0.01;
         }
 
-        ss.str(  runMacro.GetLineWith( (keyword+"_y").c_str() )->String().Data() );
+        ss.str(  runMacro.GetLineWith( (keyword1+"_y").c_str() )->String().Data() );
         ss.clear();
         ss >> foo >> yLen >> yUnit;
         if( yUnit == "cm" ){
             yLen *= 0.01;
         }
 
-        ss.str(  runMacro.GetLineWith( (keyword+"_z").c_str() )->String().Data() );
+        ss.str(  runMacro.GetLineWith( (keyword1+"_z").c_str() )->String().Data() );
         ss.clear();
         ss >> foo >> zLen >> zUnit;
         if( zUnit == "cm" ){
