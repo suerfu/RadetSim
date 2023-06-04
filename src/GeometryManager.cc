@@ -148,7 +148,7 @@ void  GeometryManager::DefineMaterials( ){
     
     G4int nComponents;
 
-    G4Material* rock = new G4Material("Rock", density= 3.26*g/cm3, nComponents = 14);
+    G4Material* rock = new G4Material("Rock", density= 2.7*g/cm3, nComponents = 14);
 
     G4Element* elSi = new G4Element( "Silicon", symbol = "Si" , z = 14., a = 28.086*g/mole);
     G4Element* elTi = new G4Element( "Titanium", symbol = "Ti" , z = 22., a = 47.867*g/mole);
