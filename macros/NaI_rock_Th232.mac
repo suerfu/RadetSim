@@ -15,8 +15,8 @@
 
 # some custom filter-related commands:
 
-/filter/recordWhenHit virtualDetector
-/filter/killWhenHit virtualDetector
+/filter/recordWhenHit NaIDetector
+#/filter/killWhenHit virtualDetector
 #/filter/killParticle Pb208
 
 # some custom generator-related commands:
@@ -32,4 +32,4 @@
 /gps/energy 0 keV
 
 /run/printProgress 10000
-/run/beamOn 10000000
+/run/beamOn 100000000

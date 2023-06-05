@@ -58,6 +58,12 @@ set(SCRIPTS
   /macros/vis.mac
   /macros/icons.mac
   /macros/test.mac
+  /macros/rock_K40.mac
+  /macros/rock_U238.mac
+  /macros/rock_Th232.mac
+  /macros/NaI_rock_K40.mac
+  /macros/NaI_rock_U238.mac
+  /macros/NaI_rock_Th232.mac
   )
 
 foreach(_script ${SCRIPTS})
