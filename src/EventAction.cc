@@ -97,7 +97,7 @@ void EventAction::BeginOfEventAction(const G4Event*){
     //At the beginning of the event, insert a special flag.
     StepInfo stepinfo;
     stepinfo.SetProcessName( "newEvent" );
-    GetStepCollection().push_back(stepinfo);
+    GetStepCollection().push_back( stepinfo );
 }
 
 

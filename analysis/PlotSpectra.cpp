@@ -1,11 +1,11 @@
 /*
-    written by B. Suerfu
+    written by Suerfu Burkhant
     on 2022-05-06
     suerfu@berkeley.edu
 */
 
 // history:
-// 2022-05-06 B. Suerfu initial version
+// 2022-05-06 Suerfu initial version
 
 // description:
 // This file will read in processed ROOT files with RQ and plots the spectrum in energy region-of-interest
