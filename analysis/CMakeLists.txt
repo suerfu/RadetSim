@@ -15,7 +15,7 @@ list(REMOVE_ITEM CEF_CXX_COMPILER_FLAGS
 # Find ROOT
 IF(NOT DEFINED ROOT_FOUND)
   message("Root not found... Let's try Find_package ;)")
-  find_package(ROOT 6.26 CONFIG REQUIRED)
+  find_package(ROOT CONFIG REQUIRED)
   #find_package(ROOT COMPONENTS MathMore Matrix Hist Tree Graf Gpad)
   IF(NOT ${ROOT_FOUND})
       message("Root not found... have to try an other way ;)")

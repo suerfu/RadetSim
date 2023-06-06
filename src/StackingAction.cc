@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -49,10 +49,11 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
         motherProcess = track->GetCreatorProcess()->GetProcessName();
     }
 
-    if( motherProcess!="RadioactiveDecay" ){
+    if( motherProcess.find("RadioactiveDecay")!=std::string::npos ){
         return fUrgent;
     }
     else{
+        //G4cout << "Radioactivity out of window detected!" << G4endl;
         const_cast<G4Track*>(track)->SetGlobalTime(0);
         return fWaiting;
     }
