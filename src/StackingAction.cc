@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -48,8 +48,9 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
     if( track->GetCreatorProcess()!=0 ){
         motherProcess = track->GetCreatorProcess()->GetProcessName();
     }
+    //G4cout << "Name: " << track->GetParticleDefinition()->GetParticleName() << "\tt: " << track->GetGlobalTime() << "\tCreatorProc: " << motherProcess << G4endl;
 
-    if( motherProcess!="RadioactiveDecay" ){
+    if( motherProcess.find("RadioactiveDecay")==std::string::npos ){
         return fUrgent;
     }
     else{
