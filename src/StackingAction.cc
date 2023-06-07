@@ -49,7 +49,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
         motherProcess = track->GetCreatorProcess()->GetProcessName();
     }
 
-    if( motherProcess.find("RadioactiveDecay")!=std::string::npos ){
+    if( motherProcess.find("RadioactiveDecay")==std::string::npos ){
         return fUrgent;
     }
     else{
