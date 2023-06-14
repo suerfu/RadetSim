@@ -96,7 +96,7 @@ void GeometryConstruction::ConstructUserVolumes(){
     //
     G4Box* rock_solid = new G4Box( "rock_solid", world_x/2.0, world_y/2.0, world_z/4.0);
     G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, "rock_lv");
-    G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "rock", world_lv, false, 0, fCheckOverlaps);
+    G4VPhysicalVolume* rock_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "Rock", world_lv, false, 0, fCheckOverlaps);
 
     // Lead shielding
     //
@@ -125,7 +125,7 @@ void GeometryConstruction::ConstructUserVolumes(){
     G4Tubs* NaI_solid = new G4Tubs( "NaI_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
     G4Material* NaIMaterial = GeometryManager::Get()->GetMaterial( "NaI" );
     G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, "NaI_lv" );
-    new G4PVPlacement( 0, G4ThreeVector(0,0,height/2), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
+    new G4PVPlacement( 0, G4ThreeVector(0,0,height/2+5*cm), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
 
 /*
     simple_cube->Construct();
