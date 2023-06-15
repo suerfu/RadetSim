@@ -116,7 +116,7 @@ void GeometryConstruction::ConstructUserVolumes(){
 
     G4Material* shieldingMaterial = GeometryManager::Get()->GetMaterial( "G4_Pb" );
     G4LogicalVolume* shielding_lv = new G4LogicalVolume( shielding_solid, shieldingMaterial, "shielding_lv");
-    G4VPhysicalVolume* shielding_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,Pb_z/2), shielding_lv, "Shielding", world_lv, false, 0, fCheckOverlaps);
+    G4VPhysicalVolume* shielding_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,Pb_z/2+3*cm), shielding_lv, "Shielding", world_lv, false, 0, fCheckOverlaps);
 
     // NaI detector
     //
@@ -125,7 +125,7 @@ void GeometryConstruction::ConstructUserVolumes(){
     G4Tubs* NaI_solid = new G4Tubs( "NaI_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
     G4Material* NaIMaterial = GeometryManager::Get()->GetMaterial( "NaI" );
     G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, "NaI_lv" );
-    new G4PVPlacement( 0, G4ThreeVector(0,0,height/2+5*cm), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
+    new G4PVPlacement( 0, G4ThreeVector(0,0,height/2+3*cm+5*cm), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
 
 /*
     simple_cube->Construct();
