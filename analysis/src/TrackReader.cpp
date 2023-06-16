@@ -4,12 +4,14 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TObjString.h"
-#include "TKey.h"
+//#include "TKey.h"
 
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <set>
+
+#include "MacroHandler.h"
 
 // history:
 // 2022-05-06 B. Suerfu adding functions to calculate simulation duration automatically.
@@ -443,31 +445,6 @@ vector<string> TrackReader::GetVOIFromFile( vector<string> inputName){
 }
 
 
-// Iterate over the list of objects until you find a matching name.
-TMacro TrackReader::GetMacro( string input, string name ){
-
-    TFile* file = TFile::Open( input.c_str(), "READ");
-
-    TIter next( file->GetListOfKeys() );
-    TString mac_name;
-    TKey *key;
-
-    while( (key=(TKey*)next()) ){
-
-        mac_name = key->GetName();
-
-        if ( mac_name.EqualTo(name) ){
-            TMacro mac( *((TMacro*)file->Get( mac_name )) );
-            file->Close();
-            return mac;
-        }
-    }
-
-    file->Close();
-    return TMacro();
-}
-
-
 double TrackReader::GetTimeSimulated( TMacro runMacro, TMacro geoMacro ){
 
     double NbParticle = GetNbParticleSimulated( runMacro );
@@ -561,49 +538,3 @@ double TrackReader::GetTimeSimulated( TMacro runMacro, TMacro geoMacro ){
 }
 
 
-// Warning: this function needs improvements
-// At the current state, it does not deal with duplicate macro lines or lines starting with comment #
-// Since GetLineWith will return the first line that contains the pattern.
-
-double TrackReader::GetNbParticleSimulated( TMacro mac ){
-
-    string target( mac.GetLineWith( "/run/beamOn" )->String() );
-    stringstream ss( target );
-
-    string foo;
-    double NbParticle = -1;
-
-    ss >> foo >> NbParticle;
-
-    return NbParticle;
-}
-
-
-
-double TrackReader::GetMassByMaterial( TMacro macro, string name ){
-
-    double mass = 0;
-
-    TList* maclist = macro.GetListOfLines();
-    TIter itr(maclist);
-
-    for( itr=maclist->begin(); itr!=maclist->end(); itr() ){
-
-        TObject* obj = *itr;
-
-        string line( obj->GetName() );
-        stringstream ss( line );
-
-        string vol, mat;
-        double mass_indiv;
-
-        ss >> vol >> mass_indiv >> mat;
-
-        if( mat==name ){
-            mass += mass_indiv;
-        }
-    }
-
-    return mass;
-
-}

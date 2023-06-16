@@ -19,8 +19,10 @@
 #include "TTreeReaderValue.h"
 #include "TFile.h"
 #include "TTree.h"
-using namespace std;
 
+#include "MacroHandler.h"
+
+using namespace std;
 
 //////////////////////
 // String operation //
@@ -212,7 +214,12 @@ int main(int argc, char* argv[])
     events->Branch("multiplicity",&multiplicity,"multiplicity/I");
     events->Branch("index",&index,"index/I");
 
+    TMacro mac1("NbSimulated");
+    TMacro mac2("RockMass");
 
+    double NbParticle = 0;
+    double rockMass = 0;
+    int massCount = 0;
 
 for(const string& filename : inputFilenames){
 
@@ -231,6 +238,21 @@ for(const string& filename : inputFilenames){
       continue;
     }
     else{
+
+        TMacro mac1 = GetMacro( f, "runMacro" );        
+        double Nb = GetNbParticleSimulated( mac1 );
+        NbParticle += Nb;
+
+        TMacro mac2 = GetMacro( f, "geometryTable" );
+        double mass = GetMassByMaterial( mac2, "rock" );
+        rockMass += mass;
+
+        mass = GetMassByMaterial( mac2, "Rock" );
+        rockMass += mass;
+
+        massCount += 1;
+
+
       TTree *t1 = (TTree*)f->Get("events");
       Int_t nentries = (Int_t)t1->GetEntries();
       //cout<<nentries<<endl;
@@ -351,6 +373,20 @@ for(const string& filename : inputFilenames){
 
 
 }//loop over all the files
+
+outputfile->cd();
+
+stringstream ss1;
+ss1 << NbParticle;
+
+mac1.AddLine( ss1.str().c_str() );
+mac1.Write();
+
+stringstream ss2;
+ss2 << rockMass / massCount;
+
+mac2.AddLine( ss2.str().c_str() );
+mac2.Write();
 
 outputfile->Write();
 outputfile->Close();
