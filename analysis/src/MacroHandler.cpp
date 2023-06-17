@@ -44,6 +44,23 @@ TMacro GetMacro( TFile* file, string macroName ){
 }
 
 
+// Returns the (only) float number in the macro
+// Useful for getting duration and NbSimulated, etc.
+//
+double GetFloat( TMacro macro ){
+
+    double val = 0;
+
+    auto tmp = (TObjString*) ( macro.GetListOfLines()->First() );
+    TString str( tmp->GetString() );
+
+    stringstream ss( str.Data() );
+    ss >> val;
+
+    return val;
+}
+
+
 // Warning: this function needs improvements
 // At the current state, it does not deal with duplicate macro lines or lines starting with comment #
 // Since GetLineWith will return the first line that contains the pattern.
@@ -89,3 +106,26 @@ double GetMassByMaterial( TMacro macro, string name ){
     return mass;
 
 }
+
+
+
+double GetMassByName( TMacro geoMacro, string voi ){
+
+    double mass = 0;
+
+    auto tmp = geoMacro.GetLineWith( voi.c_str() );
+
+    if( tmp!= 0 ){
+        stringstream ss(  tmp->String().Data() );
+        string foo;
+        ss >> foo >> mass;
+    }
+    else{
+        cerr << "Failed to get active mass of " << voi << endl;
+    }
+
+    return mass;
+}
+
+
+

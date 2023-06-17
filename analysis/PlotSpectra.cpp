@@ -109,15 +109,6 @@ struct Spectrum{
 };
 
 
-// Returns the run duration from the specified macro.
-//
-double GetDuration( TMacro macro );
-
-
-// Returns the active mass from the specified macro.
-//
-double GetActiveMass( TMacro macro, string voi );
-
 
 // Fill histogram from another ROOT tree.
 //
@@ -266,10 +257,10 @@ int main( int argc, char* argv[]){
                 FillHistFromTree( &temp, *k, voi, i->vetoInfo );
 
                 TMacro mac_duration = GetMacro( *k, "duration" );
-                duration = GetDuration( mac_duration );
+                duration = GetFloat( mac_duration );
 
                 TMacro mac_mass = GetMacro( *k, "geometryTable" );
-                activeMass = GetActiveMass( mac_mass, voi );
+                activeMass = GetMassByName( mac_mass, voi );
 
                 cout << "\tduration: " << duration << ", active volume: " << voi << ", active mass: " << activeMass << endl;
 
@@ -413,42 +404,6 @@ void FillHistFromTree( TH1F* hist, string rootName, string voi, map<string, doub
     //cout << "\t\tFile closed." << endl;
 }
 
-
-
-double GetActiveMass( TMacro geoMacro, string voi ){
-
-    double mass = 1;
-
-    auto tmp = geoMacro.GetLineWith( voi.c_str() );
-    //cout << tmp->String().Data() << endl;
-
-    if( tmp!= 0 ){
-        stringstream ss(  tmp->String().Data() );
-        string foo;
-        ss >> foo >> mass;
-        //cout << foo << " " << mass << endl;
-    }
-    else{
-        cerr << "Failed to get active mass of " << voi << endl;
-    }
-
-    return mass;
-}
-
-
-
-double GetDuration( TMacro macro ){
-
-    double duration = -1;
-
-    auto tmp = (TObjString*) ( macro.GetListOfLines()->First() );
-    TString str( tmp->GetString() );
-
-    stringstream ss( str.Data() );
-    ss >> duration;
-
-    return duration;
-}
 
 
 bool CheckArguments( int argc, char* argv[] ){
