@@ -54,6 +54,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
         return fUrgent;
     }
     else{
+        //G4cout << "Radioactivity out of window detected!" << G4endl;
         const_cast<G4Track*>(track)->SetGlobalTime(0);
         return fWaiting;
     }

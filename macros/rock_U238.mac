@@ -1,9 +1,4 @@
-# Macro file for the initialization
-# in interactive session
-
-# Set geometry
-#/geometry/type 0
-#/geometry/construct
+/geometry/type 100
 
 # Initialize kernel
 /run/initialize
@@ -18,8 +13,6 @@
 /filter/recordWhenHit virtualDetector
 /filter/killWhenHit virtualDetector
 #/filter/killParticle Pb208
-
-# some custom generator-related commands:
 
 #/generator/spectrum config/generator/rockGammaK40.root
 #/generator/particle gamma

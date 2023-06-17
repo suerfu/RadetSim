@@ -38,10 +38,15 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 
+#include <string>
+
+using std::string;
+
 
 /// Basic usage of the program.
 void PrintUsage();
 
+string GetClassName(){ return "main"; }
 
 int main( int argc, char** argv ){
     
@@ -70,21 +75,26 @@ int main( int argc, char** argv ){
         }
     }
 
-
+    G4cout << GetClassName() << ": Constructing RunManager..." << G4endl;
     G4RunManager * runManager = new G4RunManager();
-
 
     // Construct detector geometry
     // GeometryManager is simply a central place to obtain information regarding the geometries and materials used in this program.
     //
+    G4cout << GetClassName() << ": Constructing GeometryManager..." << G4endl;
     GeometryManager* geometryManager = GeometryManager::Get();
+
+    G4cout << GetClassName() << ": Constructing GeometryConstruction..." << G4endl;
     GeometryConstruction* detectorConstruction = new GeometryConstruction( geometryManager );
+
+    G4cout << GetClassName() << ": Setting GeometryConstruction User Initialization..." << G4endl;
     runManager->SetUserInitialization( detectorConstruction );
 
 
     // Physics list
     // For now, simply use the shielding physics list. This may be changed in the future for more customization.
     //
+    G4cout << GetClassName() << ": Constructing Shielding PhysicsList..." << G4endl;
     G4VModularPhysicsList* physicsList = new Shielding;
 
 /*
@@ -97,24 +107,34 @@ int main( int argc, char** argv ){
     physicsList->RegisterPhysics( new G4ImportanceBiasing(&geom_sampler_ep) );
 */
     // Note below line has to be after setting up biasing.
+    G4cout << GetClassName() << ": Setting PhysicsList User Initialization..." << G4endl;
     runManager->SetUserInitialization( physicsList );
 
 
     // Run action
     //
+    G4cout << GetClassName() << ": Constructing RunAction..." << G4endl;
     RunAction* runAction = new RunAction( &cmdl );
+
+    G4cout << GetClassName() << ": Setting RunAction..." << G4endl;
     runManager->SetUserAction( runAction );
 
 
     // Primary generator
     //
+    G4cout << GetClassName() << ": Constructing GeneratorAction..." << G4endl;
     GeneratorAction* generatorAction = new GeneratorAction( runAction );
+    
+    G4cout << GetClassName() << ": Setting GeneratorAction..." << G4endl;
     runManager->SetUserAction( generatorAction );
 
 
     // Event action
     //
+    G4cout << GetClassName() << ": Constructing EventAction..." << G4endl;
     EventAction* eventAction = new EventAction( runAction );
+    
+    G4cout << GetClassName() << ": Setting EventAction..." << G4endl;
     runManager->SetUserAction( eventAction );
 
 
@@ -123,13 +143,20 @@ int main( int argc, char** argv ){
     // This is checked using RunAction's output filename since TTree and TTile are initialized afterwards.
     //
     //if( runAction->GetOutputFileName()!="" ){
+    G4cout << GetClassName() << ": Constructing and setting TrackingAction..." << G4endl;
     runManager->SetUserAction( new TrackingAction( runAction, eventAction ) );
+    
+    G4cout << GetClassName() << ": Constructing and setting SteppingAction..." << G4endl;
     runManager->SetUserAction( new SteppingAction( runAction, eventAction ) );
+    
+    G4cout << GetClassName() << ": Constructing and setting StackingAction..." << G4endl;
     runManager->SetUserAction( new StackingAction( runAction, eventAction ) );
     //}
 
+    //runManager->Initialize();
+    //  this line should be called within the macro
+    //  so that user can pass geometry parameters inside
 
-    runManager->Initialize();
     //detectorConstruction->CreateImportanceStore();
 
 
@@ -138,7 +165,7 @@ int main( int argc, char** argv ){
     // 2. visualization is not explicitly disabled.
     //
     G4VisManager* visManager = 0;
-    if( cmdl.Find("vis")==true && ui!=0 ){
+    if( ( (cmdl.Find("vis")==true) || (cmdl.Find("v")==true) ) && ui!=0 ){
         visManager = new G4VisExecutive;
     }
 
@@ -190,11 +217,9 @@ void PrintUsage() {
     G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
     G4cerr << "\t-m/--macro,       used to specify the macro file to execute.\n";
     G4cerr << "\t-u/--interactive, enter interactive session. In this case, do not use -m/--macro\n";
-    G4cerr << "\t--vis,            enable visualization. (disabled by default)\n";
+    G4cerr << "\t-v,--vis,         enable visualization. (disabled by default)\n";
     G4cerr << "\t--seed,           the random seed to be used. (default current time)\n";
-    G4cerr << "\t-o/--output       specify the output file name to which trajectories will be recorded.\n";
+    G4cerr << "\t-o/--output,      specify the output file name to which trajectories will be recorded.\n";
     G4cerr << G4endl;
 }
-
-
 

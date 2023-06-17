@@ -19,8 +19,10 @@
 #include "TTreeReaderValue.h"
 #include "TFile.h"
 #include "TTree.h"
-using namespace std;
 
+#include "MacroHandler.h"
+
+using namespace std;
 
 //////////////////////
 // String operation //
@@ -185,10 +187,11 @@ int main(int argc, char* argv[])
     Int_t eventID, index, multiplicity;
     char volume[16], particle[16], parentParticle[16];
 
-    Double_t ARt[20],ARrx[20],ARry[20],ARrz[20],ARpx[20],ARpy[20],ARpz[20],AREki[20],ARParentrx[20],ARParentry[20],ARParentrz[20],
-              ARParentpx[20],ARParentpy[20],ARParentpz[20],ARParentEki[20];
-    Int_t AReventID[20];
-    char ARvolume[20][16], ARparticle[20][16],ARParent[20][16];
+    const int ArraySize = 30;
+    Double_t ARt[ArraySize],ARrx[ArraySize],ARry[ArraySize],ARrz[ArraySize],ARpx[ArraySize],ARpy[ArraySize],ARpz[ArraySize],AREki[ArraySize],ARParentrx[ArraySize],ARParentry[ArraySize],ARParentrz[ArraySize],
+              ARParentpx[ArraySize],ARParentpy[ArraySize],ARParentpz[ArraySize],ARParentEki[ArraySize];
+    Int_t AReventID[ArraySize];
+    char ARvolume[ArraySize][16], ARparticle[ArraySize][16],ARParent[ArraySize][16];
 
     events->Branch("t",&t,"t/D");
     events->Branch("rx",&rx,"rx/D");
@@ -211,7 +214,12 @@ int main(int argc, char* argv[])
     events->Branch("multiplicity",&multiplicity,"multiplicity/I");
     events->Branch("index",&index,"index/I");
 
+    TMacro mac1("NbSimulated");
+    TMacro mac2("RockMass");
 
+    double NbParticle = 0;
+    double rockMass = 0;
+    int massCount = 0;
 
 for(const string& filename : inputFilenames){
 
@@ -230,6 +238,21 @@ for(const string& filename : inputFilenames){
       continue;
     }
     else{
+
+        TMacro mac1 = GetMacro( f, "runMacro" );        
+        double Nb = GetNbParticleSimulated( mac1 );
+        NbParticle += Nb;
+
+        TMacro mac2 = GetMacro( f, "geometryTable" );
+        double mass = GetMassByMaterial( mac2, "rock" );
+        rockMass += mass;
+
+        mass = GetMassByMaterial( mac2, "Rock" );
+        rockMass += mass;
+
+        massCount += 1;
+
+
       TTree *t1 = (TTree*)f->Get("events");
       Int_t nentries = (Int_t)t1->GetEntries();
       //cout<<nentries<<endl;
@@ -259,7 +282,9 @@ for(const string& filename : inputFilenames){
       t1->SetBranchAddress("Eki",&Intial_E);
       t1->SetBranchAddress("process",Process_ID);
 
-      for(Int_t q=0;q<nentries;q++){
+    Int_t q0 = 0; // 236166967; // this number was used for debugging
+
+      for(Int_t q=q0;q<nentries;q++){
           t1->GetEntry(q);
           Int_t n_secondary;
           std::string Volume(Vol_ID);
@@ -277,8 +302,8 @@ for(const string& filename : inputFilenames){
             Temp_Energy=Intial_E;
             strncpy(Temp_particle, Particle_ID, 16);
 
-            //cout<<event_ID<<"     "<<track_ID<<"   "<<step_ID<<" "<<Particle<<"   "<<Volume<<"    "<<Process<<"    "<<parent_ID<<endl;
           }
+            //cout << q << ' ' <<event_ID << '\t'<< Particle<<"\t"<<Volume<<"\t"<<Process<<"\t"<<parent_ID << '\t' << Multiplicity <<endl;
 
           if ( Volume.compare(main_volume)==0){
             ARt[Multiplicity]=time;
@@ -301,7 +326,6 @@ for(const string& filename : inputFilenames){
             strncpy(ARparticle[Multiplicity], Particle_ID, 16);
             strncpy(ARParent[Multiplicity], Temp_particle, 16);
             Multiplicity++;
-
 
             //cout<<event_ID<<"     "<<track_ID<<"   "<<step_ID<<" "<<Particle<<"   "<<Volume<<"    "<<Process<<"    "<<parent_ID<<endl;
           }
@@ -349,6 +373,20 @@ for(const string& filename : inputFilenames){
 
 
 }//loop over all the files
+
+outputfile->cd();
+
+stringstream ss1;
+ss1 << NbParticle;
+
+mac1.AddLine( ss1.str().c_str() );
+mac1.Write();
+
+stringstream ss2;
+ss2 << rockMass / massCount;
+
+mac2.AddLine( ss2.str().c_str() );
+mac2.Write();
 
 outputfile->Write();
 outputfile->Close();

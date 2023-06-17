@@ -83,8 +83,8 @@ void  GeometryManager::DefineMaterials( ){
 	// Liquid helium
     // ***********************************
     //
-    G4Material* LHe = new G4Material( "LHe", z=2., a= 4.00*g/mole, density= 0.141*g/cm3 );
-	materialColor["LHe"] = G4Color( 1, 0.1, 1 );
+    //G4Material* LHe = new G4Material( "LHe", z=2., a= 4.00*g/mole, density= 0.141*g/cm3 );
+	//materialColor["LHe"] = G4Color( 1, 0.1, 1 );
 
     // ***********************************
 	// Sodium Iodide

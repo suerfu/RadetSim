@@ -145,7 +145,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/){
 
 
 
-void RunAction::EndOfRunAction(const G4Run* /*run*/){}
+void RunAction::EndOfRunAction( const G4Run* ){}
 
 
 
@@ -158,12 +158,12 @@ void RunAction::AddRecordWhenHit( G4String a){ recordWhenHit.insert(a); }
 
 
 bool RunAction::RecordWhenHit( G4String a ){
-    if( recordWhenHit.empty()==true ){
+    if( recordWhenHit.empty() == true ){
         return true;
             // If no volume is specified, record everything.
     }
     else{
-        return recordWhenHit.find( a )!=recordWhenHit.end();
+        return recordWhenHit.find( a ) != recordWhenHit.end();
     }
 }
 
@@ -171,21 +171,21 @@ bool RunAction::RecordWhenHit( G4String a ){
 void RunAction::AddKillWhenHit( G4String a){ killWhenHit.insert(a); }
 
 bool RunAction::KillWhenHit( G4String a ){
-    return killWhenHit.find( a )!=killWhenHit.end();
+    return killWhenHit.find( a ) != killWhenHit.end();
 }
 
 
 void RunAction::AddExcludeParticle( G4String a){ excludeParticle.insert(a); }
 
 bool RunAction::ExcludeParticle( G4String a ){
-    return excludeParticle.find( a )!=excludeParticle.end();
+    return excludeParticle.find( a ) != excludeParticle.end();
 }
 
 
 void RunAction::AddKillParticle( G4String a){ killParticle.insert(a); }
 
-bool RunAction::KillParticle( G4String s){
-    return killParticle.find(s)!=killParticle.end();
+bool RunAction::KillParticle( G4String a ){
+    return killParticle.find( a ) != killParticle.end();
 }
 
 
@@ -193,12 +193,12 @@ bool RunAction::KillParticle( G4String s){
 void RunAction::AddExcludeVolume( G4String a){ excludeVolume.insert(a); }
 
 bool RunAction::ExcludeVolume( G4String a ){
-    return excludeVolume.find( a )!=excludeVolume.end();
+    return excludeVolume.find( a ) != excludeVolume.end();
 }
 
 
 void RunAction::AddExcludeProcess( G4String a){ excludeProcess.insert(a); }
 
 bool RunAction::ExcludeProcess( G4String a ){
-    return excludeProcess.find( a )!=excludeProcess.end();
+    return excludeProcess.find( a ) != excludeProcess.end();
 }

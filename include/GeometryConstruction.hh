@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -13,19 +13,17 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "GeometryManager.hh"
 
-#include "SimpleCube.hh"
-#include "FarsideDetectorMessenger.hh"
-
 #include "globals.hh"
 
+#include <string>
+
+using std::string;
 
 class GeometryConstructionMessenger;
 
 
 /// Detector construction class to define materials and geometry.
-
-
-
+//
 class GeometryConstruction : public G4VUserDetectorConstruction{
 
 public:
@@ -48,10 +46,10 @@ public:
 
 private:
 
+    string GetClassName(){ return "GeometryConstruction"; }
+
     GeometryManager* fGeometryManager;
     GeometryConstructionMessenger* fDetectorMessenger;
-
-    FarsideDetectorMessenger* fFarsideMessenger;
 
     bool fCheckOverlaps;
 
@@ -59,8 +57,7 @@ private:
     G4double world_y;
     G4double world_z;
 
-    SimpleCube* simple_cube;
-
+    int geometryType;
 };
 
 

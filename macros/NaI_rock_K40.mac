@@ -1,16 +1,11 @@
-# Macro file for the initialization
-# in interactive session
-
 # Set geometry
-#/geometry/type 0
-#/geometry/construct
+/geometry/type 101
 
 # Initialize kernel
+
 /run/initialize
 /tracking/verbose 0
 
-#/control/getEnv a
-#/control/getEnv b
 #/random/setSeeds {a} {b}
 
 # some custom filter-related commands:

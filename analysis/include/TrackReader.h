@@ -52,13 +52,6 @@ public:
     // Get duration of simulation in seconds
     double GetTimeSimulated( TMacro run, TMacro geo );
 
-    // Get the number of particle simulated in this run
-    double GetNbParticleSimulated( TMacro mac );
-
-    // Returns the total mass based on material
-    double GetMassByMaterial( TMacro macro, string name );
-
-
 private:
 
     static const unsigned int MAX_FILENAME_LEN = 128;
@@ -100,9 +93,6 @@ private:
         // index of the event cluster when multiple event occurred in the DAQ window.
     double timeStamp;
         // timeStamp of the interaction.
-
-    // Function to retrieve TMacro from the output file so that subsequent inputs are macros.
-    TMacro GetMacro( string file, string name);
 
     double Nsimulated;
         // Total No. of particles simulated in this run

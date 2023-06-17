@@ -5,7 +5,7 @@
 */
 
 // history:
-// 2022-05-06 Suerfu initial version
+// 2022-05-06 Suerfu Burkhant initial version
 
 // description:
 // This file will read in processed ROOT files with RQ and plots the spectrum in energy region-of-interest
@@ -41,7 +41,9 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TObjString.h"
-#include "TKey.h"
+//#include "TKey.h"
+
+#include "MacroHandler.h"
 
 #include <iostream>
 #include <string>
@@ -50,7 +52,6 @@
 
 #include <fstream>
 #include <sstream>
-
 
 
 using namespace std;
@@ -108,11 +109,6 @@ struct Spectrum{
 };
 
 
-// Obtains a ROOT macro file from the specified ROOT file by name.
-//
-TMacro GetMacro( string rootName, string macroName);
-
-
 // Returns the run duration from the specified macro.
 //
 double GetDuration( TMacro macro );
@@ -121,11 +117,6 @@ double GetDuration( TMacro macro );
 // Returns the active mass from the specified macro.
 //
 double GetActiveMass( TMacro macro, string voi );
-
-
-// Returns the total mass based on material
-//
-double GetTotalMassByMaterial( TMacro macro, string name );
 
 
 // Fill histogram from another ROOT tree.
@@ -320,34 +311,6 @@ int main( int argc, char* argv[]){
     }
 
     return 0;
-
-}
-
-
-TMacro GetMacro( string rootName, string macroName){
-
-    TFile* file = TFile::Open( rootName.c_str(), "READ");
-
-    TIter next( file->GetListOfKeys() );
-    TString mac_name;
-    TKey *key;
-
-    while( (key=(TKey*)next()) ){
-
-        mac_name = key->GetName();
-
-        if ( mac_name.EqualTo(macroName) ){
-            TMacro mac( *((TMacro*)file->Get( mac_name )) );
-            file->Close();
-            return mac;
-        }
-    }
-
-    cerr << "Failed to get macro " << macroName << " from file " << rootName << endl;
-
-    file->Close();
-
-    return TMacro();
 
 }
 
