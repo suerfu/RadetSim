@@ -39,7 +39,7 @@ GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetect
     // Set default values for world.
     world_x = 1.*m;
     world_y = 1.*m;
-    world_z = 1.*m;
+    world_z = 1.5*m;
 }
 
 
@@ -66,14 +66,14 @@ G4VPhysicalVolume* GeometryConstruction::Construct(){
 
 G4VPhysicalVolume* GeometryConstruction::ConstructWorld(){
 
-    G4String world_name = "world";
-    G4Material* world_material = fGeometryManager->GetMaterial("G4_Galactic");
+    G4String world_name = "World";
+    G4Material* world_material = fGeometryManager->GetMaterial("G4_AIR");
 
-    G4Box* world_solid = new G4Box( world_name+"_sld", world_x/2.0, world_y/2.0, world_z/2.0);
-    G4LogicalVolume* world_lv = new G4LogicalVolume( world_solid, world_material, world_name+"_lv");
-    G4VPhysicalVolume* world_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,0), world_lv, world_name, 0, false, 0,fCheckOverlaps);
+    G4Box* world_solid = new G4Box( world_name+"_sld", world_x/2.0, world_y/2.0, world_z/2.0 );
+    G4LogicalVolume* world_lv = new G4LogicalVolume( world_solid, world_material, world_name+"_lv" );
+    G4VPhysicalVolume* world_pv = new G4PVPlacement( 0, G4ThreeVector(0,0,0), world_lv, world_name, 0, false, 0, fCheckOverlaps );
 
-    world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+    //world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
 
     return world_pv;
 }
@@ -84,38 +84,43 @@ void GeometryConstruction::ConstructUserVolumes(){
     geometryType = GeometryManager::Get()->GetGeometryType();
     G4cout << GetClassName() << ": The type of geometry is " << geometryType << G4endl;
     
+    G4LogicalVolume* world_lv = GeometryManager::Get()->GetLogicalVolume("World");
+    
     // if type is within 100 and 200, then it is a rock-related geometry
     //
     if( geometryType >= 100 && geometryType <=199 ){
 
-        G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock" );
-
-        G4LogicalVolume* world_lv = GeometryManager::Get()->GetLogicalVolume("world");
-    
         // Rock extending half of the world
         //
-        G4Box* rock_solid = new G4Box( "rock_solid", world_x/2.0, world_y/2.0, world_z/4.0);
-        G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, "rock_lv");
-        new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, "Rock", world_lv, false, 0, fCheckOverlaps);
+        G4String name = "Rock";
+
+        G4Material* rockMaterial = GeometryManager::Get()->GetMaterial( "Rock" );
+
+        G4Box* rock_solid = new G4Box( name+"_solid", world_x/2.0, world_y/2.0, world_z/4.0 );
+        G4LogicalVolume* rock_lv = new G4LogicalVolume( rock_solid, rockMaterial, name+"_lv" );
+        new G4PVPlacement( 0, G4ThreeVector(0,0,-world_z/4), rock_lv, name, world_lv, false, 0, fCheckOverlaps);
 
         // 100 ==> rock + virtual detector
         //
         if( geometryType==100 ){
 
+            name = "virtualDetector";
+
             G4Material* virtualDetMaterial = GeometryManager::Get()->GetMaterial( "G4_Galactic" );
 
-            G4Box* det_solid = new G4Box( "virtualDetector_solid", world_x/2.0, world_y/2.0, world_z/4.0);
-
-            G4LogicalVolume* det_lv = new G4LogicalVolume( det_solid, virtualDetMaterial, "virtualDetector_lv");
-
-            new G4PVPlacement( 0, G4ThreeVector(0,0,world_z/4), det_lv, "virtualDetector", world_lv, false, 0, fCheckOverlaps);
+            G4Box* det_solid = new G4Box( name+"_solid", world_x/2.0, world_y/2.0, world_z/4.0);
+            G4LogicalVolume* det_lv = new G4LogicalVolume( det_solid, virtualDetMaterial, name+"_lv");
+            new G4PVPlacement( 0, G4ThreeVector(0,0,world_z/4), det_lv, name, world_lv, false, 0, fCheckOverlaps);
         }
 
         // 101 ==> rock + NaI inside Pb shielding
         //
         if( geometryType==101 ){
+
             // Lead shielding
             //
+            name = "Shielding";
+
             G4double Pb_x = 30 * cm;
             G4double Pb_y = 30 * cm;
             G4double Pb_z = 50 * cm;
@@ -127,21 +132,25 @@ void GeometryConstruction::ConstructUserVolumes(){
             G4double Air_y = 10 * cm;
             G4double Air_z = 30 * cm;
             G4Box* air_solid = new G4Box( "air_solid", Air_x/2.0, Air_y/2.0, Air_z/2.0);
-
-            G4VSolid* shielding_solid = new G4SubtractionSolid( "shielding_solid", Pb_solid, air_solid, 0, G4ThreeVector(0,0,-Pb_z/2+Air_z/2));
-
+            
             G4Material* shieldingMaterial = GeometryManager::Get()->GetMaterial( "G4_Pb" );
-            G4LogicalVolume* shielding_lv = new G4LogicalVolume( shielding_solid, shieldingMaterial, "shielding_lv");
-            new G4PVPlacement( 0, G4ThreeVector(0,0,Pb_z/2+3*cm), shielding_lv, "Shielding", world_lv, false, 0, fCheckOverlaps);
+
+            G4VSolid* shielding_solid = new G4SubtractionSolid( name+"_solid", Pb_solid, air_solid, 0, G4ThreeVector(0,0,-Pb_z/2+Air_z/2));
+            G4LogicalVolume* shielding_lv = new G4LogicalVolume( shielding_solid, shieldingMaterial, name+"_lv");
+            new G4PVPlacement( 0, G4ThreeVector( 0, 0, Pb_z/2+3*cm ), shielding_lv, name, world_lv, false, 0, fCheckOverlaps);
 
             // NaI detector
             //
+            name = "NaI";
+
             G4double diameter = 1.5 * 2.54 * cm;
             G4double height = diameter;
-            G4Tubs* NaI_solid = new G4Tubs( "NaI_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
+
             G4Material* NaIMaterial = GeometryManager::Get()->GetMaterial( "NaI" );
-            G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, "NaI_lv" );
-            new G4PVPlacement( 0, G4ThreeVector(0,0,height/2+3*cm+5*cm), NaI_lv, "NaIDetector", world_lv, false, 0, fCheckOverlaps );
+
+            G4Tubs* NaI_solid = new G4Tubs( name+"_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
+            G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, name+"_lv" );
+            new G4PVPlacement( 0, G4ThreeVector( 0, 0, height/2+3*cm+5*cm ), NaI_lv, name+"Detector", world_lv, false, 0, fCheckOverlaps );
         }
     }
 }

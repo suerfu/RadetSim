@@ -116,7 +116,7 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     fCumulativeMaterialVolume = 0;
         // this variable contains the total mass of the material of concern.
 
-    cout<<"Generator setting material to be " << materialName << endl;
+    G4cout<<"Generator setting material to be " << materialName << G4endl;
 
     // Iterate over all physical volumes and add the mass of volumes with matching material.
     //
@@ -126,6 +126,8 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     while( i<(G4int)PVStore->size() ){
 
         G4VPhysicalVolume* pv = (*PVStore)[i];
+
+        G4cout << "Checking " << pv->GetName() << G4endl;
 
         if (pv->GetLogicalVolume()->GetMaterial()->GetName() == materialName) {
             fVolumesInMaterial.push_back(pv);
@@ -137,6 +139,7 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     }
 
     if( fVolumesInMaterial.empty() ){
+        G4cout << "Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'" << G4endl;
         throw std::runtime_error("Generator::GPSInMaterial::SetMaterial did not find volume made of '" + materialName + "'");
     }
 

@@ -178,7 +178,7 @@ int main( int argc, char** argv ){
     // Process macro or start UI session  
     // Batch mode
     // 
-    if ( macroname!="" ){
+    if ( macroname!="" && ui==0 ){
         runAction->AddMacro( macroname );
         G4String command = "/control/execute ";
         UImanager->ApplyCommand( command+macroname );
@@ -186,13 +186,22 @@ int main( int argc, char** argv ){
     // Interactive mode
     //
     else{
+        // First initialize vis manager and execute the init_vis macro
+        //
         if( visManager!=0 ){
             visManager->Initialize();
         }
+
+        if( macroname!="" ){
+            UImanager->ApplyCommand("/control/execute "+macroname);
+        }
+
         UImanager->ApplyCommand("/control/execute macros/init_vis.mac");
+
         if (ui->IsGUI()) {
             UImanager->ApplyCommand("/control/execute macros/gui.mac");
         }
+
         ui->SessionStart();
     }
 
@@ -216,7 +225,7 @@ int main( int argc, char** argv ){
 void PrintUsage() {
     G4cerr << "\nUsage: executable [-option [argument(s)] ]" << G4endl;
     G4cerr << "\t-m/--macro,       used to specify the macro file to execute.\n";
-    G4cerr << "\t-u/--interactive, enter interactive session. In this case, do not use -m/--macro\n";
+    G4cerr << "\t-u/--interactive, enter interactive session. If -m/--macro is specified, macro is executed before init_vis.mac\n";
     G4cerr << "\t-v,--vis,         enable visualization. (disabled by default)\n";
     G4cerr << "\t--seed,           the random seed to be used. (default current time)\n";
     G4cerr << "\t-o/--output,      specify the output file name to which trajectories will be recorded.\n";
