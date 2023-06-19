@@ -52,27 +52,28 @@ target_link_libraries(DetectorTemplate ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 # build DetectorTemplate. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(SCRIPTS
-  /macros/gui.mac
-  /macros/init_vis.mac
-  /macros/vis.mac
-  /macros/icons.mac
-  /macros/test.mac
-  /macros/rock_K40.mac
-  /macros/rock_U238.mac
-  /macros/rock_Th232.mac
-  /macros/NaI_rock_K40.mac
-  /macros/NaI_rock_U238.mac
-  /macros/NaI_rock_Th232.mac
-  )
+file(COPY ${PROJECT_SOURCE_DIR}/macros DESTINATION ${PROJECT_BINARY_DIR})
+#set(SCRIPTS
+#  /macros/gui.mac
+#  /macros/init_vis.mac
+#  /macros/vis.mac
+#  /macros/icons.mac
+#  /macros/test.mac
+#  /macros/rock_K40.mac
+#  /macros/rock_U238.mac
+#  /macros/rock_Th232.mac
+#  /macros/NaI_rock_K40.mac
+#  /macros/NaI_rock_U238.mac
+#  /macros/NaI_rock_Th232.mac
+#  )
 
-foreach(_script ${SCRIPTS})
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/${_script}
-    ${PROJECT_BINARY_DIR}/${_script}
-    COPYONLY
-    )
-endforeach()
+#foreach(_script ${SCRIPTS})
+#  configure_file(
+#    ${PROJECT_SOURCE_DIR}/${_script}
+#    ${PROJECT_BINARY_DIR}/${_script}
+#    COPYONLY
+#    )
+#endforeach()
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
