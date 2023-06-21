@@ -26,7 +26,7 @@ void TrackReader::ConfigureTTree( TTree* tree ){
     // Set global-level information
     //
     stringstream ss;
-    ss << "file[" << MAX_FILENAME_LEN << "]/C";
+    ss << "file[" << max_file_len+1 << "]/C";
     tree->Branch( "file", &inputFileNameChar, ss.str().c_str() );
 
     tree->Branch( "ID", &ID, "ID/I");
@@ -40,12 +40,33 @@ void TrackReader::ConfigureTTree( TTree* tree ){
     // Set Parent info if enabled
     //
     if( GetParentInfo()==true ){
-        tree->Branch( "parentParticle", &parentParticle, "parentParticle[16]/C" );
-        tree->Branch( "parentVolume", &parentVolume, "parentVolume[16]/C" );
+
+        stringstream name1;
+        name1 << "parent[" << max_particle_len << "]/C";
+        stringstream name2;
+        name2 << "parentVolume[" << max_volume_len << "]/C";
+
+        tree->Branch( "parent", &parentParticle, name1.str().c_str() );
+        tree->Branch( "parentVolume", &parentVolume, name2.str().c_str() );
         tree->Branch( "parentRx", &parentPosition[0], "parentRx/D" );
         tree->Branch( "parentRy", &parentPosition[1], "parentRy/D" );
         tree->Branch( "parentRz", &parentPosition[2], "parentRz/D" );
         tree->Branch( "parentEki", &parentEki, "parentEki/D" );
+    }
+
+    if( GetAncestorInfo()==true ){
+
+        stringstream name1;
+        name1 << "ancestor[" << max_particle_len << "]/C";
+        stringstream name2;
+        name2 << "ancestorVolume[" << max_volume_len << "]/C";
+
+        tree->Branch( "ancestor", &ancestorParticle, name1.str().c_str() );
+        tree->Branch( "ancestorVolume", &ancestorVolume, name2.str().c_str() );
+        tree->Branch( "ancestorRx", &ancestorPosition[0], "ancestorRx/D" );
+        tree->Branch( "ancestorRy", &ancestorPosition[1], "ancestorRy/D" );
+        tree->Branch( "ancestorRz", &ancestorPosition[2], "ancestorRz/D" );
+        tree->Branch( "ancestorEki", &ancestorEki, "ancestorEki/D" );
     }
 
     // Generate energy deposition array for active volumes.
@@ -109,7 +130,12 @@ void TrackReader::ConfigureTTree( TTree* tree ){
 bool TrackReader::NewEvent( char* name ){
     if (strncmp( name, "newEvent", 8)==0 )
         return true;
-    else if( strncmp( name, "timeReset", 9)==0 )
+    return false;
+}
+
+
+bool TrackReader::NewEventByTimeReset( char* name ){
+    if( strncmp( name, "timeReset", 9)==0 )
         return true;
     return false;
 }
@@ -132,8 +158,12 @@ void TrackReader::Process( string outputStr, vector<string> inputStr ){
     // Create ROOT file
     // ==================================================
     //
-    TFile* outputFile = new TFile( outputStr.c_str(), "NEW" );
-
+    TFile* outputFile;
+    if( GetForceCreate()==true )
+        outputFile = new TFile( outputStr.c_str(), "RECREATE" );
+    else
+        outputFile = new TFile( outputStr.c_str(), "NEW" );
+        
     TMacro gTab;
         // Keep one copy of geometry table in the output.
         // By default, it will be the first occurance.
@@ -148,6 +178,9 @@ void TrackReader::Process( string outputStr, vector<string> inputStr ){
     // Create ROOT TTree and initialize branches.
     // ==================================================
     //
+
+    max_file_len = GetMaxFileLength( inputStr );
+
     TTree* tree = new TTree("events", "Event-level information for MC simulated tracks.");
     ConfigureTTree( tree );
         // Set the addresses of global-level variables.
@@ -206,9 +239,9 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
         return;
     }
 
-    cout << "Processing " << input << endl;
+    cout << "Processing " << GetStrippedString(input) << endl;
 
-    strncpy( inputFileNameChar, input.c_str(), MAX_FILENAME_LEN-1 );
+    strncpy( inputFileNameChar, GetStrippedString(input).c_str(), max_file_len );
 
     // ==================================================
     // Retrieve the tree and set branch address of variables for readout
@@ -238,20 +271,31 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
     //
     unsigned int nEntries = inputTree->GetEntries();
 
+    ancestorID = 0;
+        // < 0 by default
+    
+    parentID = 0;
+        // < 0 by default
+    
+    bool hit = false;
+        // turns true when a hit registers in the detector
+
     // Here initial index is starting with 1 since in any valid file, first entry is newEvent.
     // If file is empty, the for-loop condition is not satisfied, thus won't be executed.
     //
-    for( unsigned int n = 1; n<nEntries; n++ ){
+    for( unsigned int n = 0; n<nEntries; n++ ){
 
         inputTree->GetEntry(n);
 
         // If current event is a new event or the last event, fill the previous event and initialize.
         //
-        if( NewEvent( rdata.processName )==true || n==nEntries-1 ){
+        if( NewEvent( rdata.processName )==true || NewEventByTimeReset( rdata.processName ) ==true || n==nEntries-1 ){
 
             //cout << "Processing event " << eventID << " at entry " << n <<endl;
-            ProcessPulseArray( tree );
-                // filling is done at this step.
+            if( n>0 ){
+                ProcessPulseArray( tree );
+                    // filling is done at this step.
+            }
 
             map<string, MCPulseArray>::iterator clr;
             for( clr=pulseArrayAV.begin(); clr!=pulseArrayAV.end(); clr++ ){
@@ -260,6 +304,13 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
             for( clr=pulseArrayVOI.begin(); clr!=pulseArrayVOI.end(); clr++ ){
                 (clr->second).Clear();
             }
+
+            if( NewEvent( rdata.processName)==true ){
+                ancestorID = -1;
+            }
+            parentID = -1;
+
+            hit = false;
         }
 
         // If not new event flag, then it's a regular step.
@@ -269,17 +320,30 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
         else{
 
             eventID = rdata.eventID;
+            //cout << "EventID: " << eventID << ", parentID: " << rdata.trackID << endl;
 
             // Suerfu on June 20, 2023: set parent information if not set yet.
-            //
-            if( parentID < 0 ){
+            // Once active detector has been hit, one should stop tracing.
+            if( GetParentInfo() && /*parentID == -1 &&*/ IsRadioactiveDecay( rdata.processName ) && hit==false ){
                 parentID = rdata.trackID;
-                //parentParticle = rdata.particleName;
-                //parentVolume = rdata.volumeName;
+                strncpy( parentParticle, rdata.particleName, max_particle_len );
+                strncpy( parentVolume, rdata.volumeName, max_volume_len );
                 parentPosition[0] = rdata.position[0];
                 parentPosition[1] = rdata.position[1];
                 parentPosition[2] = rdata.position[2];
                 parentEki = rdata.Eki;
+                //cout << "Tracing decay chain: " << rdata.particleName << endl;
+            }
+
+            if( GetAncestorInfo() && ancestorID == -1 ){
+                ancestorID = rdata.trackID;
+                strncpy( ancestorParticle, rdata.particleName, max_particle_len );
+                strncpy( ancestorVolume, rdata.volumeName, max_volume_len );
+                ancestorPosition[0] = rdata.position[0];
+                ancestorPosition[1] = rdata.position[1];
+                ancestorPosition[2] = rdata.position[2];
+                ancestorEki = rdata.Eki;
+                cout << "Found ancestor: " << rdata.particleName << endl;
             }
 
             if( rdata.Edep>1e-9 ){
@@ -288,6 +352,7 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
 
                 if( find( arrayAV.begin(), arrayAV.end(), name ) != arrayAV.end() ){
                     pulseArrayAV[name].PushBack( ConvertToMCPulse(rdata ) );
+                    hit = true;
                 }
 
                 else if( find( arrayVOI.begin(), arrayVOI.end(), name ) != arrayVOI.end() ){
@@ -561,4 +626,17 @@ double TrackReader::GetTimeSimulated( TMacro runMacro, TMacro geoMacro ){
     }
 }
 
+
+unsigned int TrackReader::GetMaxFileLength( vector<string> inputs ){
+
+    unsigned int max_size = 0;
+
+    vector<string>::iterator itr;
+    for( itr=inputs.begin(); itr!=inputs.end(); itr++){
+        string a = GetStrippedString( *itr );
+        max_size = ( max_size > a.size() ? max_size : a.size() );
+    }
+
+    return max_size;
+}
 

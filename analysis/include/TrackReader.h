@@ -27,6 +27,9 @@ public:
         coinWindow = 100;   // 100 ns coincidence window
 
         parentInfo = true;
+        ancestorInfo = false;
+
+        forceCreate = false;
     }
 
     // Destructor
@@ -63,6 +66,15 @@ public:
     //
     void Process( string output, vector<string> inputs );
 
+    unsigned int GetMaxFileLength( vector<string> inputs );
+
+    string GetStrippedString( string a ){
+        std::size_t found = a.rfind('/');
+        if( found!=std::string::npos )
+            return a.substr( a.rfind("/")+1, a.size() );
+        return a;
+    }
+
     // Get duration of simulation in seconds
     //
     double GetTimeSimulated( TMacro run, TMacro geo );
@@ -73,6 +85,18 @@ public:
 
     void SetParentInfo( bool a ){ parentInfo = a;}
 
+    // Return whether ancestor/top of chain info should be recorded in the output
+    //
+    bool GetAncestorInfo(){ return ancestorInfo; }
+
+    void SetAncestorInfo( bool a ){ ancestorInfo = a;}
+
+    // Returns whether output file should be force recreated if existing.
+    //
+    bool GetForceCreate(){ return forceCreate; }
+
+    void SetForceCreate( bool f ){ forceCreate=f; }
+
 private:
 
     static const unsigned int MAX_FILENAME_LEN = 128;
@@ -81,6 +105,11 @@ private:
     double coinWindow;
 
     bool parentInfo;
+        // this is the isotope whose decay is directly responsible for the energy deposit.
+    bool ancestorInfo;
+        // this is the top of the decay chain
+
+    bool forceCreate;
 
     vector<string> arrayAV;
         // This array holds the active volumes.
@@ -108,6 +137,8 @@ private:
 
     char inputFileNameChar[ MAX_FILENAME_LEN ];
         // name of the file to which this event belongs to
+    unsigned int max_file_len;
+
     unsigned int ID;
         // global ID of the event processed
     unsigned int eventID;
@@ -118,14 +149,29 @@ private:
         // timeStamp of the interaction.
 
     unsigned int parentID;
+        // This is the immediate mother of the decay product causing the edep
 
-    char parentParticle[16];
+    unsigned int ancestorID;
+        // This is the very original radioactive isotope.
 
-    char parentVolume[16];
+    static const int max_particle_len = 16;
+        // max length of characters for particle name
+    static const int max_volume_len = 20;
+        // max length of characters for volume and process names
+
+    char parentParticle[ max_particle_len ];
+    char ancestorParticle[ max_particle_len ];
+
+    char parentVolume[ max_volume_len ];
+    char ancestorVolume[max_volume_len ];
 
     double parentPosition[3];
+    double ancestorPosition[3];
 
     double parentEki;
+    double ancestorEki;
+
+    bool IsRadioactiveDecay( char* proc ){ return strncmp( proc, "RadioactiveDeca", 15)==0; }
 
     double Nsimulated;
         // Total No. of particles simulated in this run
@@ -145,6 +191,10 @@ private:
     void ProcessPulseArray( TTree* tree );
 
     bool NewEvent( char* name );
+        // Returns true if current event is the beginning of a new event
+
+    bool NewEventByTimeReset( char* name );
+        // Returns true if current event is due to time reset of radioactive decay
 
     StepInfo rdata;
 

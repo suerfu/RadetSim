@@ -47,7 +47,7 @@ private:
     TTree* data_tree;
         //!< Pointer to a ROOT TTree object.
 
-    static const int max_char_len1 = 10;
+    static const int max_char_len1 = 16;
         //!< Max character length to store shorter ones such as particle name.
 
     static const int max_char_len2 = 20;

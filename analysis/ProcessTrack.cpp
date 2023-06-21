@@ -98,6 +98,15 @@ int main( int argc, char* argv[] ){
         reader.SetParentInfo( false );
     }
 
+    if( cmdl.Find("--ancestor")==true ){
+        reader.SetAncestorInfo( true );
+    }
+
+
+    if( cmdl.Find("--force-create")==true || cmdl.Find("-f")==true ){
+        reader.SetForceCreate( true );
+    }
+
     reader.Process( outputFile, inputFiles );
 
     reader.Reset();
@@ -117,6 +126,9 @@ void PrintUsage( char* argv[] ){
     cout << "\n--daq:    " << "Specifies acquisition window in ns. Default 1000 ns." << endl;
     cout << "          " << "Energy deposits within this window will be summed and reported as the energy deposit of the event." << endl;
     cout << "\n--coin:   " << "Specifies coincidence window in ns for more than one active volumes/other volumes of interest. Default 100 ns." << endl;
-    cout << "          " << "Once a leading energy deposit in the active volume is identified, if there are energy deposits within this window in other active volumes and volumes of interest," << endl;
-    cout << "          " << "\tenergy deposits within acquisition window in these volumes will be summed and reported as coincident events in the corresponding volumes.\n" << endl;
+    cout << "          " << "Once a leading energy deposit in the active volume is identified, if there are energy deposits within this window in other active volumes and volumes of interest." << endl;
+    cout << "          " << "Energy deposits within acquisition window in these volumes will be summed and reported as coincident events in the corresponding volumes." << endl;
+    cout << "\n--no-parent:       " << "If specified, the information of the original/initial parent particle information causing the event is NOT recorded (default to record)." << endl;
+    cout << "\n--ancestor:        " << "If specified, the information of the very original parent particle informatiof the event IS recorded (default not to record)." << endl;
+    cout << "\n-f,--force-create: " << "Output file will be overwritten when the same file already exists. By default, no overwriting.\n" << endl;
 }
