@@ -14,7 +14,7 @@
 #include "MacroHandler.h"
 
 // history:
-// 2022-05-06 B. Suerfu adding functions to calculate simulation duration automatically.
+// 2022-05-06 Suerfu adding functions to calculate simulation duration automatically.
 //      Note: at this stage if run/beamOn, confine or wall_ appears in comments, it may affect result.
 //      Note2: surface mode supports only full surface. It does not support particular surfaces.
 
@@ -36,6 +36,17 @@ void TrackReader::ConfigureTTree( TTree* tree ){
     timeStamp = -1;
     tree->Branch( "timeStamp", &timeStamp, "timeStamp/D" );
         // Time stamp is by default -1.
+
+    // Set Parent info if enabled
+    //
+    if( GetParentInfo()==true ){
+        tree->Branch( "parentParticle", &parentParticle, "parentParticle[16]/C" );
+        tree->Branch( "parentVolume", &parentVolume, "parentVolume[16]/C" );
+        tree->Branch( "parentRx", &parentPosition[0], "parentRx/D" );
+        tree->Branch( "parentRy", &parentPosition[1], "parentRy/D" );
+        tree->Branch( "parentRz", &parentPosition[2], "parentRz/D" );
+        tree->Branch( "parentEki", &parentEki, "parentEki/D" );
+    }
 
     // Generate energy deposition array for active volumes.
     //
@@ -71,7 +82,6 @@ void TrackReader::ConfigureTTree( TTree* tree ){
             tmp = find(arrayVOI.begin(), arrayVOI.end(), *itr1);
         }
     }
-
 
     // Generate energy deposition array for volumes of interest.
     //
@@ -192,8 +202,7 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
     //
     TFile* inputFile = TFile::Open( input.c_str(), "READ");
     if( !inputFile ){
-        cerr << "ERROR reading file " << input << endl;
-        cerr << "Skipping...\n";
+        cerr << "ERROR reading file " << input << ". Skipping..." << endl;
         return;
     }
 
@@ -212,13 +221,16 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
     inputTree -> SetBranchAddress( "eventID",  &rdata.eventID);
     inputTree -> SetBranchAddress( "trackID",  &rdata.trackID);
     inputTree -> SetBranchAddress( "parentID", &rdata.parentID);
-    inputTree -> SetBranchAddress( "particle", &rdata.particle_name);
-    inputTree -> SetBranchAddress( "volume",   &rdata.volume_name);
+    inputTree -> SetBranchAddress( "particle", &rdata.particleName);
+    inputTree -> SetBranchAddress( "volume",   &rdata.volumeName);
+    inputTree -> SetBranchAddress( "rx",       &rdata.position[0]);
+    inputTree -> SetBranchAddress( "ry",       &rdata.position[1]);
+    inputTree -> SetBranchAddress( "rz",       &rdata.position[2]);
     inputTree -> SetBranchAddress( "Eki",      &rdata.Eki);
     inputTree -> SetBranchAddress( "Ekf",      &rdata.Ekf);
     inputTree -> SetBranchAddress( "Edep",     &rdata.Edep);
     inputTree -> SetBranchAddress( "t",        &rdata.time);
-    inputTree -> SetBranchAddress( "process",  &rdata.proc_name);
+    inputTree -> SetBranchAddress( "process",  &rdata.processName);
 
     // ==================================================
     // Loop over the tree and process the events.
@@ -235,7 +247,7 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
 
         // If current event is a new event or the last event, fill the previous event and initialize.
         //
-        if( NewEvent( rdata.proc_name )==true || n==nEntries-1 ){
+        if( NewEvent( rdata.processName )==true || n==nEntries-1 ){
 
             //cout << "Processing event " << eventID << " at entry " << n <<endl;
             ProcessPulseArray( tree );
@@ -258,9 +270,21 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
 
             eventID = rdata.eventID;
 
+            // Suerfu on June 20, 2023: set parent information if not set yet.
+            //
+            if( parentID < 0 ){
+                parentID = rdata.trackID;
+                //parentParticle = rdata.particleName;
+                //parentVolume = rdata.volumeName;
+                parentPosition[0] = rdata.position[0];
+                parentPosition[1] = rdata.position[1];
+                parentPosition[2] = rdata.position[2];
+                parentEki = rdata.Eki;
+            }
+
             if( rdata.Edep>1e-9 ){
 
-                string name = string( rdata.volume_name );
+                string name = string( rdata.volumeName );
 
                 if( find( arrayAV.begin(), arrayAV.end(), name ) != arrayAV.end() ){
                     pulseArrayAV[name].PushBack( ConvertToMCPulse(rdata ) );
@@ -351,7 +375,7 @@ MCPulse TrackReader::ConvertToMCPulse( StepInfo step ){
 
     MCPulse val;
 
-	int index = MCPulse::GetEdepIndex( step.particle_name );
+	int index = MCPulse::GetEdepIndex( step.particleName );
 	val.SetEnergy( index, step.Edep );
     val.SetTime( step.time );
 
@@ -415,7 +439,7 @@ vector<string> TrackReader::GetVOIFromFile( vector<string> inputName){
         TTree* inputTree = (TTree*)inputFile->Get("events");
 
         StepInfo rdata;
-        inputTree -> SetBranchAddress( "volume",   &rdata.volume_name);
+        inputTree -> SetBranchAddress( "volume",   &rdata.volumeName);
 
         // Loop over the tree and process the events.
         //
@@ -425,9 +449,9 @@ vector<string> TrackReader::GetVOIFromFile( vector<string> inputName){
 
             inputTree->GetEntry(n);
 
-            string name = rdata.volume_name;
+            string name = rdata.volumeName;
             if( name!="" ){
-                container.insert( rdata.volume_name);
+                container.insert( rdata.volumeName);
             }
         }
         inputFile->Close();

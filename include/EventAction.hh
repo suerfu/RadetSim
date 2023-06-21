@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -47,13 +47,17 @@ private:
     TTree* data_tree;
         //!< Pointer to a ROOT TTree object.
 
-    int max_char_len;
-        //!< Maximum character length to store in ROOT. Using char[] insteat of string will speed up things.
+    static const int max_char_len1 = 10;
+        //!< Max character length to store shorter ones such as particle name.
 
-    char particleName[16];
-    char volumeName[16];
-    char nextVolumeName[16];
-    char processName[16];
+    static const int max_char_len2 = 20;
+        //!< Maximum character length to store in ROOT. Using char[] insteat of string will speed up things.
+        //!< Longer version for volume names & process names.
+
+    char particleName[max_char_len1];
+    char volumeName[max_char_len2];
+    char nextVolumeName[max_char_len2];
+    char processName[max_char_len2];
 
     G4String tmp_particleName;
     G4String tmp_volumeName;
@@ -82,10 +86,10 @@ private:
         tmp_nextVolumeName = wStep.GetNextVolumeName();
         tmp_processName = wStep.GetProcessName();
 
-        strncpy( particleName, tmp_particleName.c_str(), max_char_len);
-        strncpy( processName, tmp_processName.c_str(), max_char_len);
-        strncpy( volumeName, tmp_volumeName.c_str(), max_char_len);
-        strncpy( nextVolumeName, tmp_nextVolumeName.c_str(), max_char_len);
+        strncpy( particleName, tmp_particleName.c_str(), max_char_len1);
+        strncpy( processName, tmp_processName.c_str(), max_char_len2);
+        strncpy( volumeName, tmp_volumeName.c_str(), max_char_len2);
+        strncpy( nextVolumeName, tmp_nextVolumeName.c_str(), max_char_len2);
         
         rx = wStep.GetPosition().x()/CLHEP::mm;
         ry = wStep.GetPosition().y()/CLHEP::mm;

@@ -1,5 +1,5 @@
 /*
-    Author:  Burkhant Suerfu
+    Author:  Suerfu Burkhant
     Date:    November 18, 2021
     Contact: suerfu@berkeley.edu
 */
@@ -32,11 +32,10 @@ EventAction::EventAction( RunAction* runaction ) : G4UserEventAction(), fRunActi
     tmp_volumeName = "";
     tmp_processName = "";
 
-    max_char_len = 15;
-	particleName[15] = '\0';
-	volumeName[15] = '\0';
-	nextVolumeName[15] = '\0';
-	processName[15] = '\0';
+	particleName[max_char_len1-1] = '\0';
+	volumeName[max_char_len2-1] = '\0';
+	nextVolumeName[max_char_len2-1] = '\0';
+	processName[max_char_len2-1] = '\0';
     cmdl = fRunAction->GetCommandlineArguments();
 }
 

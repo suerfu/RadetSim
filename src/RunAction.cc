@@ -23,7 +23,7 @@
 
 RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(), fRunActionMessenger(0), fCmdlArgs( c ){
 
-    version = "1.0.1";
+    version = "1.0.2";
         // Version number. Do not change.
         // Backward compatible should increment minor number
         // Bug fixes should increment patch number

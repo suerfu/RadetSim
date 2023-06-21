@@ -19,38 +19,59 @@ class TrackReader{
 public:
 
     // Constructor
-    TrackReader(){}
+    TrackReader(){
+
+        // Initialize with default values
+        //
+        daqWindow = 1000;   // DAQ window in ns
+        coinWindow = 100;   // 100 ns coincidence window
+
+        parentInfo = true;
+    }
 
     // Destructor
+    //
     ~TrackReader(){;}
 
     void Reset(){}
 
     // Add an active volume
+    //
     void SetActiveVolume( vector<string> name){ arrayAV = name;}
         // Active volume is by which event clustering will be performed
 
     // Add a volume of interest.
+    //
     void SetVoI( vector<string> name ){ arrayVOI = name; }
         // A volume of interest is by definition volume which energy deposit will be summed and recorded
 
     // Sets the (hypothetical) DAQ window in microsecond.
+    //
     void SetDAQWindow( float win = 1){ daqWindow = win;}
         // Events ocurring within this window is regarded as the same event.
 
     float GetDAQWindow(){ return daqWindow; }
 
     // Sets the coincidence window in microseconds
+    //
     void SetCoinWindow( float win = 1){ coinWindow = win;}
         // Events ocurring within this window from an event in active volume will be recorded.
     
     float GetCoinWindow(){ return coinWindow; }
 
     // Process the tracks in input and write output as a ROOT TTree in output.
+    //
     void Process( string output, vector<string> inputs );
 
     // Get duration of simulation in seconds
+    //
     double GetTimeSimulated( TMacro run, TMacro geo );
+
+    // Return whether parent info should be recorded in the output
+    //
+    bool GetParentInfo(){ return parentInfo; }
+
+    void SetParentInfo( bool a ){ parentInfo = a;}
 
 private:
 
@@ -58,6 +79,8 @@ private:
 
     double daqWindow;
     double coinWindow;
+
+    bool parentInfo;
 
     vector<string> arrayAV;
         // This array holds the active volumes.
@@ -93,6 +116,16 @@ private:
         // index of the event cluster when multiple event occurred in the DAQ window.
     double timeStamp;
         // timeStamp of the interaction.
+
+    unsigned int parentID;
+
+    char parentParticle[16];
+
+    char parentVolume[16];
+
+    double parentPosition[3];
+
+    double parentEki;
 
     double Nsimulated;
         // Total No. of particles simulated in this run

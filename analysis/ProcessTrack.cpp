@@ -6,99 +6,27 @@
 #include <string>
 
 #include "TrackReader.h"
+#include "CommandlineHandler.h"
 
 #include "TTree.h"
 #include "TFile.h"
 
 using namespace std;
 
-bool IsOpt( string tmp ){
-    if( tmp.size()>1 ){
-        if( tmp[0]=='-'){
-            if(tmp[1]=='-' || isalpha(tmp[1])>0 )
-                return true;
-        }
-    }
-    return false;
-}
 
-typedef vector<string> Parameter;
-typedef map<string, Parameter> ParameterMap;
-
-class Commandline{
-
-public:
-
-    Commandline( int argc, char* argv[]){
-        Parse( argc, argv);
-    }
-
-    ~Commandline(){}
-
-    void Parse( int argc, char* argv[]){
-
-        map.clear();
-
-        string key;
-        string tmp;
-
-        for( unsigned int i=0; i<argc; i++){
-
-            tmp = string( argv[i] );
-    
-            if( IsOpt(tmp) || i==0 ){
-                key = tmp;
-                map[key] = Parameter();
-            }
-            else{
-                map[key].push_back(tmp);
-            }
-        }
-    }
-
-    bool Find( string key ){ return map.find(key)!=map.end(); }
-    
-    vector<string> Get( string key ){ return map[key]; }
-
-    void Print(){
-        ParameterMap::iterator itr;
-        for( itr=map.begin(); itr!=map.end(); itr++ ){
-            cout << itr->first << ":";
-            for( Parameter::iterator itr2 = itr->second.begin(); itr2!=itr->second.end(); itr2++ ){
-                cout << " " << *itr2;
-            }
-            cout << endl;
-        }
-    }
-
-    int Size(){ return map.size(); }
-
-private:
-
-    ParameterMap map;
-
-};
+// Print usage information of this program.
+//
+void PrintUsage( char** argv);
 
 
-int main( int argc, char* argv[]){ 
+int main( int argc, char* argv[] ){ 
 
     // Parse commandline arguments
     //
-    Commandline cmdl( argc, argv);
+    CommandlineHandler cmdl( argc, argv);
 
     if( cmdl.Size()==1 || cmdl.Find("-h") || cmdl.Find("--help") ){
-        cout << "\nusage: " << argv[0] << " [--option param1 param2 ...] --input f0.root f1.root ... --output foo.root\n\n";
-        cout << "Options:\n";
-        cout << "\n--active: " << "Specifies the active volume(s). This is an necessary option." << endl;
-        cout << "          " << "Energy deposits in the specified active volume(s) will be used to construct events." << endl;
-        cout << "\n--voi:    " << "Specifies volume(s) of interest." << endl;
-        cout << "          " << "Energy deposits in the volumes of interest will be summed and recorded for each event in active volume(s)." << endl;
-        cout << "          " << "If not specified, all volumes involved in the simulation will be taken as volumes of interest, which may take longer." << endl;
-        cout << "\n--daq:    " << "Specifies acquisition window in ns. Default 1000 ns." << endl;
-        cout << "          " << "Energy deposits within this window will be summed and reported as the energy deposit of the event." << endl;
-        cout << "\n--coin:   " << "Specifies coincidence window in ns for more than one active volumes/other volumes of interest. Default 100 ns." << endl;
-        cout << "          " << "Once a leading energy deposit in the active volume is identified, if there are energy deposits within this window in other active volumes and volumes of interest," << endl;
-        cout << "          " << "\tenergy deposits within acquisition window in these volumes will be summed and reported as coincident events in the corresponding volumes.\n" << endl;
+        PrintUsage( argv );
         return 0;
     }
 
@@ -134,7 +62,6 @@ int main( int argc, char* argv[]){
 
     // Print the above parameters so that user knows if the program is executing with the correct parameters.
     //
-
     cout << "Energy deposits in";
     for( vector<string>::iterator itr=activeVolumes.begin(); itr!=activeVolumes.end(); itr++ )
         cout << " " << *itr;
@@ -153,15 +80,23 @@ int main( int argc, char* argv[]){
     reader.SetActiveVolume( activeVolumes );
     reader.SetVoI( voi );
 
-    if( cmdl.Find("--daq")==true )
-        reader.SetDAQWindow( stof(cmdl.Get("--daq")[0]) ); 
-    else
+    if( cmdl.Find("--daq")==true ){
+        reader.SetDAQWindow( stof(cmdl.Get("--daq")[0]) );
+    }
+    else{
         reader.SetDAQWindow( 1000 );
+    }
 
-    if( cmdl.Find("--coin")==true )
-        reader.SetCoinWindow( stof(cmdl.Get("--coin")[0]) ); 
-    else
+    if( cmdl.Find("--coin")==true ){
+        reader.SetCoinWindow( stof(cmdl.Get("--coin")[0]) );
+    }
+    else{
         reader.SetCoinWindow( 100 );
+    }
+
+    if( cmdl.Find("--no-parent")==true ){
+        reader.SetParentInfo( false );
+    }
 
     reader.Process( outputFile, inputFiles );
 
@@ -171,3 +106,17 @@ int main( int argc, char* argv[]){
 }
 
 
+void PrintUsage( char* argv[] ){
+    cout << "\nusage: " << argv[0] << " [--option param1 param2 ...] --input f0.root f1.root ... --output foo.root\n\n";
+    cout << "Options:\n";
+    cout << "\n--active: " << "Specifies the active volume(s). This is an necessary option." << endl;
+    cout << "          " << "Energy deposits in the specified active volume(s) will be used to construct events." << endl;
+    cout << "\n--voi:    " << "Specifies volume(s) of interest." << endl;
+    cout << "          " << "Energy deposits in the volumes of interest will be summed and recorded for each event in active volume(s)." << endl;
+    cout << "          " << "If not specified, all volumes involved in the simulation will be taken as volumes of interest, which may take longer." << endl;
+    cout << "\n--daq:    " << "Specifies acquisition window in ns. Default 1000 ns." << endl;
+    cout << "          " << "Energy deposits within this window will be summed and reported as the energy deposit of the event." << endl;
+    cout << "\n--coin:   " << "Specifies coincidence window in ns for more than one active volumes/other volumes of interest. Default 100 ns." << endl;
+    cout << "          " << "Once a leading energy deposit in the active volume is identified, if there are energy deposits within this window in other active volumes and volumes of interest," << endl;
+    cout << "          " << "\tenergy deposits within acquisition window in these volumes will be summed and reported as coincident events in the corresponding volumes.\n" << endl;
+}
