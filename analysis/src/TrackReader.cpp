@@ -305,7 +305,7 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
                 (clr->second).Clear();
             }
 
-            if( NewEvent( rdata.processName)==true ){
+            if( NewEvent( rdata.processName )==true ){
                 ancestorID = -1;
             }
             parentID = -1;
@@ -343,7 +343,7 @@ void TrackReader::ProcessFile( TTree* tree, string input ){
                 ancestorPosition[1] = rdata.position[1];
                 ancestorPosition[2] = rdata.position[2];
                 ancestorEki = rdata.Eki;
-                cout << "Found ancestor: " << rdata.particleName << endl;
+                //cout << "Found ancestor: " << rdata.particleName << " with energy " << rdata.Eki << endl;
             }
 
             if( rdata.Edep>1e-9 ){
