@@ -51,13 +51,12 @@ GeometryConstructionMessenger::~GeometryConstructionMessenger(){}
 
 void GeometryConstructionMessenger::SetNewValue( G4UIcommand* command, G4String newValue) {
 
-	G4cout << GetClassName() <<": SetNewValue " << newValue << G4endl;
-
 	if( command == fTypeCmd ){
 		GeometryManager::Get()->SetGeometryType( fTypeCmd->ConvertToInt(newValue) );
 		G4cout << GetClassName() <<": The type of simulation geometry is " << GeometryManager::Get()->GetGeometryType() << G4endl;
 	}
 	else if( command == fConfigCmd ){
+	    G4cout << GetClassName() <<": loading configuration file " << newValue << G4endl;
 		GeometryManager::Get()->LoadFile( newValue );
 	}
 }

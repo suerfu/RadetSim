@@ -40,6 +40,7 @@ GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetect
     world_x = 1.*m;
     world_y = 1.*m;
     world_z = 1.5*m;
+
 }
 
 
@@ -51,8 +52,20 @@ GeometryConstruction::~GeometryConstruction(){
 
 
 G4VPhysicalVolume* GeometryConstruction::Construct(){
-
+    
     G4cout << GetClassName() << ": Constructing geometry...\n";
+
+    double a;
+    if( GeometryManager::Get()->GetConfigParser()->Find( "world_x" )==true ){
+        bool found;
+        a = GeometryManager::Get()->GetConfigParser()->GetDouble( "world_x", -1.23 );
+        G4cout << a << G4endl;
+    }
+    else{
+        G4cerr << "world_x not found" << G4endl;
+    }
+    a = GeometryManager::Get()->GetConfigParser()->GetDouble("world_y", 0.);
+    G4cout << a << G4endl;
 
     G4VPhysicalVolume* world_pv = ConstructWorld();
 

@@ -84,14 +84,14 @@ public:
     int RemoveParameter( const string& s, const string& rm);
         //!< Searches the value and remove only matched value.
 
-    bool Find( const string& s);
+    bool Find( const string& s) const;
         //!< Searches for parameter.
         //!< Returns true if found.
 
 
     // access methods for arrays.
     // string array
-    vector<string> GetStrArray( const string& name );
+    vector<string> GetStrArray( const string& name ) const;
         //!< Returns parameters as vector of strings.
         //!< Empty vector if not found.
 
@@ -119,10 +119,10 @@ public:
 
 
     // returns 0th member in the vector.
-    string GetString( const string& name);
+    string GetString( const string& name) const;
         //!< Returns the first element of the string vector. Emprty string if not found.
 
-    string GetString( const string& name, string def);
+    string GetString( const string& name, string def) const;
         //!< Returns the first element of the string vector. With default value and warning message.
 
     int GetInt( const string& name, bool* found);
@@ -137,10 +137,10 @@ public:
     float GetFloat( const string& name, float def); 
         //!< Returns the parameter with specified name as float. If parameter is not found, default value is returned instead.
 
-    double GetDouble( const string& name, bool* found); 
+    double GetDouble( const string& name, bool* found) const; 
         //!< Returns the parameter with specified name as double. found is set true if key exists. Otherwise it is set as false.
 
-    double GetDouble( const string& name, double def); 
+    double GetDouble( const string& name, double def) const; 
         //!< Returns the parameter with specified name as float. If parameter is not found, default value is returned instead.
 
     bool GetBool( const string& name, bool* found); 

@@ -82,6 +82,10 @@ private:
 
     ConfigParser config;
 
+public:
+
+    const ConfigParser* GetConfigParser() { return &config; }
+
 };
 
 

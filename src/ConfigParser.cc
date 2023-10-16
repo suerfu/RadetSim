@@ -273,16 +273,17 @@ void ConfigParser::Clear(){
 
 
 
-vector< string > ConfigParser::GetStrArray( const string& name){
+vector< string > ConfigParser::GetStrArray( const string& name) const{
     string dir = ExtractDirectory(name);
     string key = ExtractParameter(name);
 
     vector<string> vec_str;   // vector for holding string value before casting
 
-    if( parameters.find( dir ) != parameters.end() ){
-        map< string, vector<string> >::iterator itr;
-        for( itr = parameters[dir].begin(); itr!=parameters[dir].end(); ++itr){
-            if(itr->first==key)
+    auto temp = parameters.find(dir);
+    if( temp != parameters.end() ){
+        map< string, vector<string> >::const_iterator itr;
+        for( itr = temp->second.begin(); itr!=temp->second.end(); ++itr){
+            if( itr->first==key )
             vec_str = itr->second;
         }
     }
@@ -292,7 +293,7 @@ vector< string > ConfigParser::GetStrArray( const string& name){
 
 
 
-string ConfigParser::GetString( const string& name ){
+string ConfigParser::GetString( const string& name ) const{
     vector< string > ret = GetStrArray( name);
     if(ret.size()==0)
         return "";
@@ -305,7 +306,7 @@ string ConfigParser::GetString( const string& name ){
 
 
 
-string ConfigParser::GetString( const string& name, string def ){
+string ConfigParser::GetString( const string& name, string def ) const{
     string ret = GetString( name );
     if( ret!="" )
         return ret;
@@ -392,9 +393,10 @@ float ConfigParser::GetFloat( const string& name, bool* found){
         *found = false;
         return 0;
     }
-    else
+    else{
         *found = true;
-    return stof( s );
+        return stof( s );
+    }
 }
 
 
@@ -410,24 +412,28 @@ float ConfigParser::GetFloat( const string& name, float def){
 }
 
 
-double ConfigParser::GetDouble( const string& name, bool* found){
-    string s = GetString( name);
+double ConfigParser::GetDouble( const string& name, bool* found) const{
+    string s = GetString( name );
+    //G4cout << "GetDouble called with " << name << ", returning " << s << G4endl;
     if( s=="" ){
         *found = false;
         return 0;
     }
-    else
+    else{
+        //G4cout << "GetDouble called with " << name << ", returning " << s << " " << stod(s) << G4endl;
         *found = true;
-    return stod( s );
+        return stod( s );
+    }
 }
 
 
 
-double ConfigParser::GetDouble( const string& name, double def){
+double ConfigParser::GetDouble( const string& name, double def) const{
     bool found = false;
     double a = GetDouble( name, &found);
-    if( found )
+    if( found ){
         return a;
+    }
     else{
         return def;
     }
@@ -478,18 +484,19 @@ bool ConfigParser::GetBool( const string& name, bool def){
 
 
 
-bool ConfigParser::Find( const string& name) {
+bool ConfigParser::Find( const string& name) const {
     bool ret = false;
     string dir = ExtractDirectory(name);    // extracted directory as /dir/
     string key = ExtractParameter(name);    // parameter name
 
-    if(parameters.find(dir)==parameters.end())
+    auto temp = parameters.find(dir);
+    if( temp==parameters.end())
         ret = false;   // didn't find the directory.
     else if( key=="" )
         ret = true;    // did not specify key, so searching for directory.
     else{
-        map<string, vector<string> >::iterator itr;
-        for( itr = parameters[dir].begin(); itr!=parameters[dir].end(); ++itr){
+        map<string, vector<string> >::const_iterator itr;
+        for( itr = temp->second.begin(); itr!=temp->second.end(); ++itr){
             if(itr->first==key)
                ret = true;
         }
