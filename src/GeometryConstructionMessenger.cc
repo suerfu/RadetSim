@@ -19,6 +19,7 @@
 
 #include "GeometryManager.hh"
 
+
 GeometryConstructionMessenger::GeometryConstructionMessenger( GeometryConstruction* placement) : G4UImessenger(){
 
     detector = placement;
@@ -39,7 +40,7 @@ GeometryConstructionMessenger::GeometryConstructionMessenger( GeometryConstructi
 
     // load the geometry configuration file.
     //
-   	fConfigCmd = new G4UIcmdWithAString( "/geometry/config", this );
+   	fConfigCmd = new G4UIcmdWithAString( "/geometry/loadconfig", this );
 	fConfigCmd->SetGuidance( "Load the specified configuration file, which includes necessary parameters as name-value pairs." );
  
 }

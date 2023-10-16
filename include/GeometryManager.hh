@@ -17,11 +17,14 @@
 
 #include "G4Color.hh"
 
+#include "ConfigParser.hh"
+
 using namespace CLHEP;
 
 /// Singleton class.
 /// It manages different attributes of geometry in the simulation/
 /// Asstributes includes dimensions, color, material, mass, etc.
+//
 class GeometryManager{
 
 private:
@@ -74,6 +77,10 @@ private:
     bool fCheckOverlaps;
 	
     int  fGeometryType; 
+
+private:
+
+    ConfigParser config;
 
 };
 

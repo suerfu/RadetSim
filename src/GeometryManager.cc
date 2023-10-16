@@ -269,5 +269,6 @@ void GeometryManager::GeometryHasBeenModified(){
 
 void GeometryManager::LoadFile( G4String filename ){
     G4cout << "Loading parameters from " << filename << G4endl;
+    config.LoadFile( filename );
 }
 

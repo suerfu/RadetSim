@@ -1,9 +1,14 @@
 #ifndef CONFIGPARSER_H
 #define CONFIGPARSER_H 1
 
-// Suerfu Burkhant on 2023 Oct. 16
-// Configuration Parser
-// Used to pass parameters into the program
+/*
+ * Author: Suerfu Burkhant
+ * Contact: suerfu@post.kek.jp
+ * Date: 2023 Oct. 16
+ * Configuration Parser
+ * Used to pass parameters into the program
+ * Adapted from polaris.git
+*/ 
 
 #include <string>
 #include <vector>
@@ -18,23 +23,9 @@
 #include <ctime>
 #include <sstream>
 
-#include <pthread.h>
-
 using namespace std;
 
-
-//! Verbosity denotes the importance / detailness of each message.
-
-//! The output handler has a verbosity level configured during startup.
-//! Each output message also has a verbosity level.
-//! When the output handler has a higher verbosity level than message's, the message is displayed.
-
-enum VERBOSITY{ ERR = 1, INFO = 2, DETAIL = 3, DEBUG = 4};
-
-
-
 //! ConfigParser reads configuration file and other commandline arguments and makes them available for each modules.
-
 //! Internally it uses a directory-like file structure to store key-value pairs, where key is parameter name and value parameter value. This directory structure is implemented using std::map.
 //!< It is possible to specify multiple parameters under the same name. 
 //!< In such cases parameters are stored and accessed as vector.
@@ -52,11 +43,8 @@ public:
     ConfigParser( int argc, char* argv[]);
         //!< Constructure with commandline arguments. It parses commandline arguments and reads the config file specified with --cgf keyword. All other keywords are stored under directory "/cmdl/".
 
-
-
     ~ConfigParser();
         //!< Destructor.
-
 
     ConfigParser( const ConfigParser& rhs);
         //!< Copy constructor.
@@ -64,25 +52,13 @@ public:
     ConfigParser& operator=( const ConfigParser& rhs);
         //!< Assignment operator.
 
-    void Serialize( ostream& os);
-        //!< Write the content of config parser into byte stream.
-
-        //!< This function is useful if one needs to dump configuration file into raw output file.
-
-    void Deserialize( istream& is);
-        //!< Read file to get the content of config parser.
-
-        //!< This function can be used to read configuration file written by Serialize method.
-
     void Initialize();
         //!< Initialize function member variables.
-        
         //!< It is created as an independent function to avoid repeating same code in different constructors.
-
 
     //======= Operations on entire structure ======================================
 
-    void LoadCmdl( int argc, char* argv[]);
+    //void LoadCmdl( int argc, char* argv[]);
         //!< Loads commandline parameters under directory /cmdl.
 
         //!< If it finds option --cfg, it will read the corresponding config file.
@@ -110,7 +86,6 @@ public:
 
     bool Find( const string& s);
         //!< Searches for parameter.
-
         //!< Returns true if found.
 
 
@@ -118,7 +93,6 @@ public:
     // string array
     vector<string> GetStrArray( const string& name );
         //!< Returns parameters as vector of strings.
-        
         //!< Empty vector if not found.
 
     // int
@@ -214,19 +188,7 @@ public:
     void Print( ostream& os, string prefix = "");
         //!< Print contents in the parameter tree to output stream.
 
-    void Print();
-        //!< Print contents in the parameter tree to standard output.
-
-
-    template < class T >
-    void Print( T t, VERBOSITY v, bool logit=true);
-        //!< Fill output message t with verbosity v.
-
-    void SetVerbosity( VERBOSITY v) { verb = v;}
-        //!< Sets verbosity of entire program.
-
-    void AddLog( char* s );
-        //!< Add logfile output.
+    string PrintToString();
 
 private:
 
@@ -261,81 +223,7 @@ private:
 
     bool str_to_bool( string s);
     
-    pthread_mutex_t mutex_cout;
-        //!< mutex to protect IO output
-
-    VERBOSITY verb;
-        //!< Verbosity of the program execution.
-
-    ofstream log;
-        //!< References output log file.
-        
-        //!< This option is enabled only if log is enabled via commandline as --log foo where foo is the name of output logfile.
-
-    time_t last_print;
-        //!< Time of last output.
-
-        //!< Used to prevent putting time stamp on every message.
-
-
-    void print_timestamp( ostream& os, const time_t* ct );
-
-
-    void print_space( ostream& os){
-        os << std::setw(10) << ' ' << std::setw(0);
-    }
-
 };
-
-
-template < class T >
-void ConfigParser::Print( T t, VERBOSITY v, bool logit){
-    if( verb>=v ){
-        pthread_mutex_lock( &mutex_cout);
-            time_t ct = time(0);
-
-            if( last_print == ct){
-                if( v==ERR )
-                    std::cout << "\033[1;31m";
-                print_space( std::cout );
-                std::cout << t;
-                std::cout << "\033[0m";
-
-                if( log && logit ){
-                    print_space( log );
-                    log << t << endl;
-                }
-            }
-            else{
-                last_print = ct;
-                print_timestamp( std::cout, &ct );
-                if( v==ERR )
-                    std::cout << "\033[1;31m";
-                std::cout << t;
-                std::cout << "\033[0m";
-
-                if( log && logit ){
-                    print_timestamp( log, &ct );
-                    log << t;
-                }
-            }
-        pthread_mutex_unlock( &mutex_cout);
-    }
-}
-
-
-
-
-/// This function should be launched as a thread.
-/// It will obtain user input as a string, and push it to the queue of strings pointed to the pointer in the argument. 
-void* GetInput( void* a);
-
-
-
-/// Calling this function will launch GetInput thread.
-/// This function has a static queue of strings that holds the input strings.
-/// Calling this function will either return the next string in queue, or "" in case of no input.
-string getstr();
 
 
 #endif

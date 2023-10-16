@@ -21,6 +21,18 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 
 #include <string>
+#include <vector>
+#include <map>
+
+#include <fstream>
+#include <iostream>
+#include <istream>
+#include <ostream>
+#include <iomanip>
+
+#include <ctime>
+#include <sstream>
+
 
 using std::string;
 
@@ -49,7 +61,6 @@ private:
     G4UIcmdWithAnInteger* fTypeCmd;
 	
     G4UIcmdWithAString*   fConfigCmd;
-
 };
 
 #endif
