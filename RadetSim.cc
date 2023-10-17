@@ -50,10 +50,14 @@ string GetClassName(){ return "main"; }
 
 int main( int argc, char** argv ){
     
+    G4cout << "RadetSim - A GEANT4-based RAdiation DETector Simulation Toolkit" << G4endl;
+    G4cout << "\tInitially developed by Suerfu Burkhant on November 8, 2021.\n" << G4endl;
+
     // Get commandline arguments.
     //
     CommandlineArguments cmdl( argc, argv);
-    cmdl.Print();
+    G4cout << GetClassName()<< ": program called with the following commandline parameters\n";
+    cmdl.Print( G4cout );
 
     // If u or interactive is specified, initialize UI executive and prepare UI session.
     // A non-zero pointer value is later used as a flag.

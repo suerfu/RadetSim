@@ -143,117 +143,127 @@ void  GeometryManager::DefineMaterials( ){
 	// taken from https://journals.aps.org/prd/pdf/10.1103/PhysRevD.74.053007
     // ***********************************
     //
-    G4double fracM;
-        // Molar fraction
+    G4int nComponents = 14;
+    density = 2.7 * g/cm3;
+        // Nb of components in the rock.
+
+    G4Material* rock = new G4Material( "Rock", density, nComponents);
     
-    G4int nComponents;
-
-    G4Material* rock = new G4Material("Rock", density= 2.7*g/cm3, nComponents = 14);
-
-    G4Element* elSi = new G4Element( "Silicon", symbol = "Si" , z = 14., a = 28.086*g/mole);
-    G4Element* elTi = new G4Element( "Titanium", symbol = "Ti" , z = 22., a = 47.867*g/mole);
-    G4Element* elAl = new G4Element( "Aluminum", symbol = "Al" , z = 13., a = 26.981*g/mole);
-    G4Element* elFe = new G4Element( "Iron", symbol = "Fe" , z = 26. , a = 55.845*g/mole);
-    G4Element* elMn = new G4Element( "Manganese", symbol = "Mn" , z = 25. , a = 54.938*g/mole);
-    G4Element* elMg = new G4Element( "Magnesium", symbol = "Mg" , z = 12. , a = 24.405*g/mole);
-    G4Element* elCa = new G4Element( "Calsium", symbol = "Ca" , z = 20. , a = 40.078*g/mole);
-	G4Element* elC  = new G4Element( "Carbon", symbol = "C", z = 6.0, a = 12.011*g/mole);
-    G4Element* elNa = new G4Element( "Sodium", symbol = "Na", z = 11., a =  22.990*g/mole);
-    G4Element* elK  = new G4Element( "Potassium", symbol = "K",  z = 19., a = 39.098*g/mole);
-    G4Element* elP  = new G4Element( "Phosphorus", symbol = "P", z = 15., a = 30.974*g/mole);
-    G4Element* elH  = new G4Element( "Hydrogen", symbol = "H", z = 1., a = 1.008*g/mole);
-    G4Element* elO  = new G4Element( "Oxygen", symbol = "O", z = 8., a = 15.999*g/mole);
-	G4Element* elS  = new G4Element( "Sulfur", symbol = "S", z = 16., a = 32.065*g/mole);
-
-    G4double fracM_O = 0;
-        // used to accumulate fractional mass of oxygen in the rock
     G4double fraction = 0;
         // fraction of weight of the composite in the rock.
 
+    G4double fracM;
+        // mass fraction of an element calculated from molar mass
+
+    G4double fracM_O = 0;
+        // used to accumulate fractional mass of oxygen in the rock
+        // accumulate NON-OXYGEN elements and subtract from 1 in the end.
+
+    G4double a_O = 15.999*g/mole;
+        // oxygen molar weight
+
     // ============ SiO2 =============
+    G4Element* elSi = new G4Element( "Silicon", symbol = "Si" , z = 14., a = 28.086*g/mole);
     fraction = 0.607;
-    fracM = 28.086 / ( 28.086 + 2*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + 2*a_O );
     rock->AddElement( elSi, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ TiO2 =============
+    G4Element* elTi = new G4Element( "Titanium", symbol = "Ti" , z = 22., a = 47.867*g/mole);
     fraction = 0.0031;
-    fracM = 47.867 / ( 47.867 + 2*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + 2*a_O );
     rock->AddElement( elTi, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ Al2O3 =============
+    G4Element* elAl = new G4Element( "Aluminum", symbol = "Al" , z = 13., a = 26.981*g/mole);
     fraction = 0.1739;
-    fracM = 2*26.981 / ( 2*26.981 + 3*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + 3*a_O );
     rock->AddElement( elAl, fracM * fraction );
+    fracM_O += fracM * fraction;
 
-    // ============ FeO and Fe2O3 =============
+    // ============ FeO =============
+    G4Element* elFe = new G4Element( "Iron", symbol = "Fe" , z = 26. , a = 55.845*g/mole);
     fraction = 0.0122;
-    fracM = 55.845 / ( 55.845 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + a_O );
 	G4double frac1 = fracM * fraction;
+    fracM_O += fracM * fraction;
 
+    // ============ Fe2O3 =============
 	fraction = 0.011;
-    fracM = 2*55.845 / ( 2*55.845 + 3*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + 3*a_O );
 	G4double frac2 = fracM * fraction;
+    fracM_O += fracM * fraction;
 
     rock->AddElement( elFe, frac1+frac2 );
 
     // ============ MnO =============
+    G4Element* elMn = new G4Element( "Manganese", symbol = "Mn" , z = 25. , a = 54.938*g/mole);
     fraction = 0.0015;
-    fracM = 54.938 / ( 54.938 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + a_O );
     rock->AddElement( elMn, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ MgO =============
+    G4Element* elMg = new G4Element( "Magnesium", symbol = "Mg" , z = 12. , a = 24.405*g/mole);
     fraction = 0.0093;
-    fracM = 24.405 / ( 24.405 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + a_O );
     rock->AddElement( elMg, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ CaO =============
+    G4Element* elCa = new G4Element( "Calsium", symbol = "Ca" , z = 20. , a = 40.078*g/mole);
     fraction = 0.06;
-    fracM = 40.078 / ( 40.078 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + a_O );
     rock->AddElement( elCa, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ Na2O =============
+    G4Element* elNa = new G4Element( "Sodium", symbol = "Na", z = 11., a =  22.990*g/mole);
     fraction = 0.0642;
-    fracM = 2*22.990 / ( 2*22.990 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + a_O );
     rock->AddElement( elNa, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ K2O =============
+    G4Element* elK  = new G4Element( "Potassium", symbol = "K",  z = 19., a = 39.098*g/mole);
     fraction = 0.0347;
-    fracM = 2*39.098 / ( 2*39.098 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + a_O );
     rock->AddElement( elK, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ P2O5 =============
+    G4Element* elP  = new G4Element( "Phosphorus", symbol = "P", z = 15., a = 30.974*g/mole);
     fraction = 0.0018;
-    fracM = 2*30.974 / ( 2*30.974 + 5*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + 5*a_O );
     rock->AddElement( elP, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ H2O =============
+    G4Element* elH  = new G4Element( "Hydrogen", symbol = "H", z = 1., a = 1.008*g/mole);
     fraction = 0.0097;
-    fracM = 2*1.008 / ( 2*1.008 + 15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = 2*a / ( 2*a + a_O );
     rock->AddElement( elH, fracM * fraction );
+    fracM_O += fracM * fraction;
 
     // ============ CO2 =============
+	G4Element* elC  = new G4Element( "Carbon", symbol = "C", z = 6.0, a = 12.011*g/mole);
 	fraction = 0.0096;
-    fracM = 12.011 / ( 12.011 + 2*15.999 );
-    fracM_O += (1-fracM)*fraction;
+    fracM = a / ( a + 2*a_O );
     rock->AddElement( elC, fracM * fraction );
+    fracM_O += fracM * fraction;
     
 	// ============ S ==============
+	G4Element* elS  = new G4Element( "Sulfur", symbol = "S", z = 16., a = 32.065*g/mole);
 	fraction = 0.0001;
+    fracM = 1;
 	rock->AddElement( elS, fraction );
+    fracM_O += fracM * fraction;
 
     // ============ Oxygen =============
+    G4Element* elO  = new G4Element( "Oxygen", symbol = "O", z = 8., a = 15.999*g/mole);
+    fracM_O = 1 - fracM_O;
     rock->AddElement( elO, fracM_O );
     
 	materialColor["Rock"] = G4Color(G4Colour::Brown());

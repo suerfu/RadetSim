@@ -8,6 +8,7 @@
 #define UTILITY_H 1
 
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <map>
 
@@ -24,9 +25,7 @@ typedef std::map<string, string > ArgumentMap;
 string IsKey( string s);
 
 
-
 string FormatArgument( bool& isKey, string s );
-
 
 
 class CommandlineArguments{
@@ -37,7 +36,7 @@ public:
 
     ~CommandlineArguments();
 
-    void Print();
+    void Print( ostream& os = cout );
 
     bool Find( string );
 

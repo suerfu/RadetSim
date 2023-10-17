@@ -70,11 +70,11 @@ CommandlineArguments::~CommandlineArguments(){
 
 
 
-void CommandlineArguments::Print(){
+void CommandlineArguments::Print( ostream& out){
 
     ArgumentMap::iterator itr;
     for( itr = cmdl.begin(); itr!=cmdl.end(); itr++ ){
-        std::cout << '\t' << itr->first << " : " << itr->second << std::endl;
+        out << '\t' << itr->first << " : " << itr->second << '\n';
     }
 
 }
