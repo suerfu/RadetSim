@@ -37,10 +37,9 @@ GeometryConstruction::GeometryConstruction( GeometryManager* gm) : G4VUserDetect
     fDetectorMessenger = new GeometryConstructionMessenger(this);
 
     // Set default values for world.
-    world_x = 1.*m;
-    world_y = 1.*m;
-    world_z = 1.5*m;
-
+    world_x = 200.;
+    world_y = 200.;
+    world_z = 200.;
 }
 
 
@@ -55,17 +54,9 @@ G4VPhysicalVolume* GeometryConstruction::Construct(){
     
     G4cout << GetClassName() << ": Constructing geometry...\n";
 
-    double a;
-    if( GeometryManager::Get()->GetConfigParser()->Find( "world_x" )==true ){
-        bool found;
-        a = GeometryManager::Get()->GetConfigParser()->GetDouble( "world_x", -1.23 );
-        G4cout << a << G4endl;
-    }
-    else{
-        G4cerr << "world_x not found" << G4endl;
-    }
-    a = GeometryManager::Get()->GetConfigParser()->GetDouble("world_y", 0.);
-    G4cout << a << G4endl;
+    world_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/x", world_x ) * cm;
+    world_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/y", world_y ) * cm;
+    world_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/z", world_z ) * cm;
 
     G4VPhysicalVolume* world_pv = ConstructWorld();
 
@@ -134,16 +125,26 @@ void GeometryConstruction::ConstructUserVolumes(){
             //
             name = "Shielding";
 
-            G4double Pb_x = 30 * cm;
-            G4double Pb_y = 30 * cm;
-            G4double Pb_z = 50 * cm;
+            G4double Pb_x = 30;
+            G4double Pb_y = 30;
+            G4double Pb_z = 50;
+            
+            Pb_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/x", Pb_x ) * cm;
+            Pb_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/y", Pb_y ) * cm;
+            Pb_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/z", Pb_z ) * cm;
+            
             G4Box* Pb_solid = new G4Box( "Pb_solid", Pb_x/2.0, Pb_y/2.0, Pb_z/2.0);
 
             // Shielding inner space
             //
-            G4double Air_x = 10 * cm;
-            G4double Air_y = 10 * cm;
-            G4double Air_z = 30 * cm;
+            G4double Air_x = 10;
+            G4double Air_y = 10;
+            G4double Air_z = 30;
+            
+            Air_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/inner_x", Air_x ) * cm;
+            Air_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/inner_y", Air_y ) * cm;
+            Air_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "shield/inner_z", Air_z ) * cm;
+            
             G4Box* air_solid = new G4Box( "air_solid", Air_x/2.0, Air_y/2.0, Air_z/2.0);
             
             G4Material* shieldingMaterial = GeometryManager::Get()->GetMaterial( "G4_Pb" );
@@ -156,14 +157,19 @@ void GeometryConstruction::ConstructUserVolumes(){
             //
             name = "NaI";
 
-            G4double diameter = 1.5 * 2.54 * cm;
-            G4double height = diameter;
+            G4double NaI_diameter = 1.5 * 2.54 * cm;
+            G4double NaI_height = NaI_diameter;
+            G4double space = 0;
+
+            NaI_diameter = GeometryManager::Get()->GetConfigParser()->GetDouble( "NaI/diameter", NaI_diameter ) * cm;
+            NaI_height = GeometryManager::Get()->GetConfigParser()->GetDouble( "NaI/height", NaI_height ) * cm;
+            space = GeometryManager::Get()->GetConfigParser()->GetDouble( "NaI/space", space ) * cm;
 
             G4Material* NaIMaterial = GeometryManager::Get()->GetMaterial( "NaI" );
 
-            G4Tubs* NaI_solid = new G4Tubs( name+"_solid", 0, diameter/2, height/2, 0, CLHEP::twopi);
+            G4Tubs* NaI_solid = new G4Tubs( name+"_solid", 0, NaI_diameter/2, NaI_height/2, 0, CLHEP::twopi);
             G4LogicalVolume* NaI_lv = new G4LogicalVolume( NaI_solid, NaIMaterial, name+"_lv" );
-            new G4PVPlacement( 0, G4ThreeVector( 0, 0, height/2+3*cm+5*cm ), NaI_lv, name+"Detector", world_lv, false, 0, fCheckOverlaps );
+            new G4PVPlacement( 0, G4ThreeVector( 0, 0, NaI_height/2+space ), NaI_lv, name+"Detector", world_lv, false, 0, fCheckOverlaps );
         }
     }
 }
