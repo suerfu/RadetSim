@@ -4,7 +4,7 @@
 # Setup the project
 #
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(DetectorTemplate)
+project(RadetSim)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -44,8 +44,8 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4, ROOT libraries
 #
-add_executable(DetectorTemplate DetectorTemplate.cc ${sources} ${headers})
-target_link_libraries(DetectorTemplate ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+add_executable(RadetSim RadetSim.cc ${sources} ${headers})
+target_link_libraries(RadetSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -78,4 +78,4 @@ file(COPY ${PROJECT_SOURCE_DIR}/macros DESTINATION ${PROJECT_BINARY_DIR})
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS DetectorTemplate DESTINATION bin)
+install(TARGETS RadetSim DESTINATION bin)
