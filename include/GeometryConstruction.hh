@@ -34,12 +34,23 @@ public:
 
 public:
 
+    /// An integer is used to identify the type of geometry/work being simulated
+    /// This function converts the user-given string to appropriate integer for calling the right function
+    /// 0 - rock
+    /// 100s - NaI measurement
+    ///     101 - 1.5-inch NaI in Kamioka in 202304
+    ///     102 -   3-inch NaI in Kamioka in 202504
+    int GetGeometryCode( G4String input );
+
+
     virtual G4VPhysicalVolume* Construct();
         // This method calls DefineMaterials and DefineVolumes successively.
 
     G4VPhysicalVolume* ConstructWorld();
 
-    void ConstructUserVolumes();
+    void ConstructKamiokaNaI( int option );
+
+    void ConstructRock();
 
     //G4VIStore* CreateImportanceStore();
 
