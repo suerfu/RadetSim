@@ -15,6 +15,8 @@
 
 #include "globals.hh"
 
+#include "NaIDetector.hh"
+
 #include <string>
 
 using std::string;
@@ -42,18 +44,14 @@ public:
     ///     102 -   3-inch NaI in Kamioka in 202504
     int GetGeometryCode( G4String input );
 
-
     virtual G4VPhysicalVolume* Construct();
         // This method calls DefineMaterials and DefineVolumes successively.
 
-    G4VPhysicalVolume* ConstructWorld();
+    G4VPhysicalVolume* ConstructRock();
 
-    void ConstructKamiokaNaI( int option );
+    G4VPhysicalVolume* ConstructKamiokaGamma2023();
 
-    void ConstructRock();
-
-    //G4VIStore* CreateImportanceStore();
-
+    G4VPhysicalVolume* ConstructKamiokaGamma2025( int option );
 
 private:
 
@@ -69,6 +67,8 @@ private:
     G4double world_z;
 
     int geometryType;
+
+    NaIDetector detector_assembly;
 };
 
 

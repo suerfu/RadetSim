@@ -361,7 +361,7 @@ vector< bool > ConfigParser::GetBoolArray( const string& name){
 
 
 
-int ConfigParser::GetInt( const string& name, bool* found){
+int ConfigParser::GetInt( const string& name, bool* found) const{
     string s = GetString( name);
     if( s=="" ){
         *found = false;
@@ -375,7 +375,7 @@ int ConfigParser::GetInt( const string& name, bool* found){
 
 
 
-int ConfigParser::GetInt( const string& name, int def){
+int ConfigParser::GetInt( const string& name, int def) const{
     bool found = false;
     int a = GetInt( name, &found);
     if( found )

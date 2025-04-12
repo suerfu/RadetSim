@@ -125,10 +125,10 @@ public:
     string GetString( const string& name, string def) const;
         //!< Returns the first element of the string vector. With default value and warning message.
 
-    int GetInt( const string& name, bool* found);
+    int GetInt( const string& name, bool* found) const;
         //!< Returns the first element of the vector. Set second argument to false if not found.
 
-    int GetInt( const string& name, int def);
+    int GetInt( const string& name, int def) const;
         //!< Returns the first element of the vector. Set second argument to false if not found.
 
     float GetFloat( const string& name, bool* found); 
