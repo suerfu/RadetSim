@@ -1,7 +1,7 @@
 /*
     Author:  Suerfu Burkhant
-    Date:    November 18, 2021
-    Contact: suerfu@berkeley.edu
+    Date:    April 21, 2025
+    Contact: suerfu@post.kek.jp
 */
 
 /// \file GeometryConstruction.hh
@@ -48,6 +48,8 @@ public:
         // This method calls DefineMaterials and DefineVolumes successively.
 
     G4VPhysicalVolume* ConstructRock();
+    
+    G4VPhysicalVolume* ConstructCrystal();
 
     G4VPhysicalVolume* ConstructKamiokaGamma2023();
 
@@ -61,12 +63,6 @@ private:
     GeometryConstructionMessenger* fDetectorMessenger;
 
     bool fCheckOverlaps;
-
-    G4double world_x;
-    G4double world_y;
-    G4double world_z;
-
-    int geometryType;
 
     NaIDetector detector_assembly;
 };

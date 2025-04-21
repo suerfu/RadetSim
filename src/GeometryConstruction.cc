@@ -1,21 +1,17 @@
 /*
     Author:  Suerfu Burkhant
-    Date:    November 18, 2021
-    Contact: suerfu@berkeley.edu
+    Date:    April 21, 2025
+    Contact: suerfu@post.kek.jp
 */
 /// \file GeometryConstruction.cc
 /// \brief Implementation of the GeometryConstruction class
 
 #include "GeometryConstruction.hh"
-
-#include "G4SubtractionSolid.hh"
-
 #include "GeometryConstructionMessenger.hh"
-#include "FarsideDetectorMessenger.hh"
-#include "FarsideDetector.hh"
 
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 
@@ -51,45 +47,35 @@ G4VPhysicalVolume* GeometryConstruction::Construct(){
     
     G4cout << GetClassName() << ": Constructing geometry...\n";
 
-    // Obtain the type of geometry from configuration parser
+    // Obtain the name of geometry from configuration parser
+    // This geometry name will be converted into a code and used in a switch statement
     //
-    G4String GeometryType = GeometryManager::Get()->GetConfigParser()->GetString( "type", "KamiokaGamma-2025" );
-    G4cout << GetClassName() << ": type of geometry is " << GeometryType << G4endl;
+    G4String GeometryName = GeometryManager::Get()->GetConfigParser()->GetString( "type", "crystal" );
+    G4cout << GetClassName() << ": name of geometry is " << GeometryName << G4endl;
 
-
-    //===================================================================
-    // Get parameters for World
-    // Construction is left for each classes
-    //===================================================================
-    
-    
-    world_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/x", 100 ) * cm;
-    world_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/y", 100 ) * cm;
-    world_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/z", 100 ) * cm;
-    
-    /*
-    G4String world_name = "World";
-    G4Material* world_material  = fGeometryManager->GetMaterial("G4_AIR");
-
-    G4Box* world_solid          = new G4Box( world_name+"_sld", world_x/2.0, world_y/2.0, world_z/2.0 );
-    G4LogicalVolume* logicWorld   = new G4LogicalVolume( world_solid, world_material, world_name+"_lv" );
-    G4VPhysicalVolume* physWorld = new G4PVPlacement( 0, G4ThreeVector(0,0,0), logicWorld, world_name, 0, false, 0, fCheckOverlaps );
-    */
-
-    //===================================================================
-    
+    // Declare physical world
+    // The definicition of world should be done by each user-case function in the 
+    //
     G4VPhysicalVolume* physWorld = 0;
 
-    switch( GetGeometryCode( GeometryType ) ){
+    switch( GetGeometryCode( GeometryName ) ){
 
+        // the world is made of half rock and the other half a virtual detector
         case 0:
             physWorld = ConstructRock();
             break;
 
+        // a crystal of user-defined size in the center
+        case 1:
+            physWorld = ConstructCrystal();
+            break;
+
+        // a simple lead castle and a NaI crystal inside
         case 100:
             physWorld = ConstructKamiokaGamma2023();
             break;
         
+        // a detailed construction of the miniLand room with steel plate, DR, walls and NaI detector assembly in a lead shielding
         case 101:
             {
                 int direction = GeometryManager::Get()->GetConfigParser()->GetInt( "direction", 0 );
@@ -113,15 +99,12 @@ G4VPhysicalVolume* GeometryConstruction::Construct(){
     // set the visual aspects of logic world
     // !!! This assumes that user has created World volume named World in the ConstrctXXX code !!!
     //
-    /*
     G4LogicalVolume* logicWorld = GeometryManager::Get()->GetLogicalVolume("World");
 
     auto visWorld = new G4VisAttributes();
     visWorld->SetForceWireframe(true);
     visWorld->SetVisibility(true);
-    
     logicWorld->SetVisAttributes(visWorld);
-    */
     
     return physWorld;
 }
@@ -131,6 +114,9 @@ int GeometryConstruction::GetGeometryCode( G4String input ){
 
     if( input == "Rock" ){
         return 0;
+    }
+    if( input == "Crystal" ){
+        return 1;
     }
     if( input == "KamiokaGamma-2023" ){
         return 100;
@@ -147,14 +133,16 @@ G4VPhysicalVolume* GeometryConstruction::ConstructRock(){
  
     G4String name = "World";
 
+    G4double world_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/x", 100 ) * cm;
+    G4double world_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/y", 100 ) * cm;
+    G4double world_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/z", 100 ) * cm;
+
     G4Material* world_material  = fGeometryManager->GetMaterial("G4_AIR");
 
     auto solidWorld = new G4Box( name, world_x/2.0, world_y/2.0, world_z/2.0 );
     auto logicWorld = new G4LogicalVolume( solidWorld, world_material, name );
     auto physWorld  = new G4PVPlacement( 0, G4ThreeVector(0,0,0), logicWorld, name, 0, false, 0, fCheckOverlaps );
 
-    // G4LogicalVolume* logicWorld = GeometryManager::Get()->GetLogicalVolume("World");
-    
     // Rock extending half of the world
     //
     name = "Rock";
@@ -183,12 +171,53 @@ G4VPhysicalVolume* GeometryConstruction::ConstructRock(){
 }
 
 
+
+G4VPhysicalVolume* GeometryConstruction::ConstructCrystal(){
+ 
+    G4String name = "World";
+
+    G4double world_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/x", 100 ) * cm;
+    G4double world_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/y", 100 ) * cm;
+    G4double world_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "/world/z", 100 ) * cm;
+
+    G4Material* world_material  = fGeometryManager->GetMaterial("G4_AIR");
+
+    G4cout << world_x << '\t' << world_y << '\t' << world_z << G4endl;
+
+    auto solidWorld = new G4Box( name, world_x/2.0, world_y/2.0, world_z/2.0 );
+    auto logicWorld = new G4LogicalVolume( solidWorld, world_material, name );
+    auto physWorld  = new G4PVPlacement( 0, G4ThreeVector(0,0,0), logicWorld, name, 0, false, 0, fCheckOverlaps );
+
+    // A crystal in the center of the world
+    //
+    name = "Crystal";
+
+    G4double crystal_dia = GeometryManager::Get()->GetConfigParser()->GetDouble( "/crystal/diameter", 1 ) * cm;
+    G4double crystal_height = GeometryManager::Get()->GetConfigParser()->GetDouble( "/crystal/height", crystal_dia/cm ) * cm;
+    G4String material_name = GeometryManager::Get()->GetConfigParser()->GetString( "/crystal/material", "G4_Si" );
+        // silicon by default
+
+    G4Material* material = GeometryManager::Get()->GetMaterial( material_name );
+
+    auto solidCrystal = new G4Tubs( name+"_solid", 0, crystal_dia/2, crystal_height/2, 0, CLHEP::twopi );
+    auto logicCrystal = new G4LogicalVolume( solidCrystal, material, name+"_lv" );
+    new G4PVPlacement( 0, G4ThreeVector( 0, 0, 0 ), logicCrystal, name, logicWorld, false, 0, fCheckOverlaps );
+
+    return physWorld;
+}
+
+
+
 G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2023( ){
     
     // World
     //
     G4String name = "World";
     
+    G4double world_x = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/x", 100 ) * cm;
+    G4double world_y = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/y", 100 ) * cm;
+    G4double world_z = GeometryManager::Get()->GetConfigParser()->GetDouble( "world/z", 100 ) * cm;
+
     G4Material* world_material  = fGeometryManager->GetMaterial("G4_AIR");
 
     auto solidWorld = new G4Box( name, world_x/2.0, world_y/2.0, world_z/2.0 );
