@@ -11,6 +11,33 @@ Relevant scripts are:
   - usage: `plot_r_vs_E.py /path/to/directory`
   - the directory needs to contain all relevant `.npz` files produced as the event-level energy deposits.
 
+# Geometry
+
+Geometry is specified through a config file. The specification is done via Geant4 macro by command `/geometry/loadconfig /path/to/config.cfg`.
+
+Below is a sample config file:
+```
+# an example config file for Crystal mode.
+
+type : Crystal,
+
+# dimension of world xyz in centi-meter
+world {
+    x : 100,
+    y : 100,
+    z : 100,
+}
+
+crystal {
+    diameter : 10,
+    height : 10,
+    material : G4_W,
+}
+```
+
+![image](https://github.com/user-attachments/assets/11d88058-52de-43ba-8556-8b011d1f96d7)
+
+
 # Example Images
 
 ![NaI](https://github.com/user-attachments/assets/3b7acd6c-0633-453b-9037-115cb2fcf16d)
