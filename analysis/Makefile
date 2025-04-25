@@ -1,11 +1,11 @@
 CC = g++ -std=c++11
 
-all : ProcessTrack RockSpecAnalyzer
+all : ProcessTrack # RockSpecAnalyzer
 
-test : testPulse testPulseArray
+# test : testPulse testPulseArray
 
-ProcessTrack : ProcessTrack.cpp ./src/TrackReader.cpp ./src/MCPulse.cpp ./src/MCPulseArray.cpp 
-	$(CC) -I./include $^ -o $@ `root-config --cflags --glibs`
+ProcessTrack : ProcessTrack.cpp ./src/TrackReader.cpp ./src/CommandlineHandler.cpp ./src/MCPulse.cpp ./src/MCPulseArray.cpp ./src/MacroHandler.cpp 
+	$(CC) -I./include $^ -o $@ `root-config --cflags --libs`
 
 RockSpecAnalyzer : RockSpecAnalyzer.cpp
 	$(CC) $^ -o $@ `root-config --cflags --glibs`
