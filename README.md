@@ -46,19 +46,11 @@ The default units are mm for length, ns for time and keV for energy.
 ## Custom Commands
 
 ### Geometry
-The current mock-up geometry is a cube target named *target* in the center of the world. The cube has an empty center, and is surrounded by a few farside detectors called *fsN* where N is a number starting from 0.
+To deal with various geometries, in addition to a macro file, a config file should be provided. The config file is responsible for
+- specifying what geometry to be simulated
+- providing all relevant parameters in the selected mode.
 
-Available commands include 
-```
-/target/material materialName
-/target/pos x y z unit
-/target/rotateX(Y,Z) N unit
-```
-```
-/farside/pos x y z unit
-/farside/rotateX(Y,Z) N unit
-/farside/set Name （apply the above parameters to farside detector called Name）
-```
+The geometry config file is loaded by the Geant4 command `geometr/loadconfig /path/to/config_file.cfg`
 
 ### Generator Action
 ```
