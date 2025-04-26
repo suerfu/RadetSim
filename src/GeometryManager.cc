@@ -75,6 +75,10 @@ G4ThreeVector GeometryManager::GetGlobalPosition( G4VPhysicalVolume* pv) {
 
         //G4cout << "Parent volume is " << mother->GetName() << " at " << mother->GetTranslation() << G4endl;
 
+        if ( mother->GetName() == "World" ){
+            break;
+        }
+
         if (mother->GetRotation()) {
             position = *(mother->GetRotation()) * position;
         }
@@ -84,10 +88,6 @@ G4ThreeVector GeometryManager::GetGlobalPosition( G4VPhysicalVolume* pv) {
         mother = GetPhysicalVolume( mother->GetMotherLogical()->GetName() );
             // Note: it assumes logical volumes are unique
             // Maybe in the future, also consider the copy number?
-
-        if ( mother->GetName() == "World" ){
-            break;
-        }
     }
 
     return position;
