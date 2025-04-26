@@ -42,5 +42,6 @@ crystal {
 
 ![NaI](https://github.com/user-attachments/assets/3b7acd6c-0633-453b-9037-115cb2fcf16d)
 ![Si](https://github.com/user-attachments/assets/10bc7be3-53d9-469e-b431-718d37d142e4)
+![Se](https://github.com/user-attachments/assets/153c9317-a819-4564-a900-7512f470f342)
 ![Ta](https://github.com/user-attachments/assets/15cf4b8e-3465-4d28-ab70-c8bf65c14b73)
 
