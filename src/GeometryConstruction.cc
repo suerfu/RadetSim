@@ -182,7 +182,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructCrystal(){
 
     G4Material* world_material  = fGeometryManager->GetMaterial("G4_AIR");
 
-    G4cout << world_x << '\t' << world_y << '\t' << world_z << G4endl;
+    G4cout << GetClassName() << ": World XYZ "<< world_x << '\t' << world_y << '\t' << world_z << G4endl;
 
     auto solidWorld = new G4Box( name, world_x/2.0, world_y/2.0, world_z/2.0 );
     auto logicWorld = new G4LogicalVolume( solidWorld, world_material, name );
@@ -195,6 +195,8 @@ G4VPhysicalVolume* GeometryConstruction::ConstructCrystal(){
     G4double crystal_dia = GeometryManager::Get()->GetConfigParser()->GetDouble( "/crystal/diameter", 1 ) * cm;
     G4double crystal_height = GeometryManager::Get()->GetConfigParser()->GetDouble( "/crystal/height", crystal_dia/cm ) * cm;
     G4String material_name = GeometryManager::Get()->GetConfigParser()->GetString( "/crystal/material", "G4_Si" );
+    G4cout << GetClassName() << ": diameter " << crystal_dia << ", height " << crystal_height << G4endl;
+    G4cout << GetClassName() << ": material " << material_name << G4endl;
         // silicon by default
 
     G4Material* material = GeometryManager::Get()->GetMaterial( material_name );
@@ -280,7 +282,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2023( ){
 
 G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option ){
     
-    G4cout << "Constructing geometries for Kamioka miniland gamma measurement in March, 2025..." << G4endl;
+    G4cout << GetClassName() << ": Constructing geometries for Kamioka miniland gamma measurement in March 2025..." << G4endl;
 
     // =======================================
     // Get materials used for this measurement
@@ -336,6 +338,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
     // ====================================
     // Geometries common to all simulations
     // ====================================
+    auto invisible = new G4VisAttributes();
 
     G4String name = "World";
 
@@ -344,7 +347,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
     G4double worldZ = roomZ+2*rockZ;
 
     auto solidWorld = new G4Box( name, worldX/2, worldY/2, worldZ/2 );
-    auto logicWorld = new G4LogicalVolume( solidWorld, rock, name );
+    auto logicWorld = new G4LogicalVolume( solidWorld, air, name );
     auto physWorld  = new G4PVPlacement( 0, G4ThreeVector(0,0,0), logicWorld, name, 0, false, 0, fCheckOverlaps );
 
     name = "Room";
@@ -352,6 +355,13 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
     auto solidRoom = new G4Box( name, roomX/2.0, roomY/2.0, roomZ/2.0 );
     auto logicRoom = new G4LogicalVolume( solidRoom, air, name );
     auto physRoom  = new G4PVPlacement( 0, G4ThreeVector(0,0,0), logicRoom, name, logicWorld, false, 0, fCheckOverlaps );
+    
+    G4cout << GetClassName() << ": constructing " << name << " in " << logicRoom->GetName()
+        << " at " << physRoom->GetTranslation()/cm << " cm\n"
+        << GetClassName() << ": " << name << " dimension (" << roomX/cm << "," << roomY/cm << "," << roomZ/cm << ") cm.\n";
+       
+    invisible->SetVisibility(false);
+    logicRoom->SetVisAttributes(invisible);
 
     name = "SteelBase";
 
@@ -361,19 +371,30 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
 
     auto solidSteelBase = new G4Box( name, steelBaseX/2.0, steelBaseY/2.0, steelBaseZ/2.0 );
     auto logicSteelBase = new G4LogicalVolume( solidSteelBase, steel, name );
-    new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,steelPosZ), logicSteelBase, name, logicRoom, false, 0, fCheckOverlaps);
+    auto physSteelBase  = new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,steelPosZ), logicSteelBase, name, logicRoom, false, 0, fCheckOverlaps);
+    
+    G4cout << GetClassName() << ": constructing " << name << " in " << physSteelBase->GetMotherLogical()->GetName()
+        << " at " << physSteelBase->GetTranslation()/cm << " cm\n"
+        << GetClassName() << ": " << name << " dimension (" << steelBaseX/cm << "," << steelBaseY/cm << "," << steelBaseZ/cm << ") cm.\n";
+    
+    logicSteelBase->SetVisAttributes(G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5)));
 
     name = "PbShield";
 
     G4double shieldPosZ = steelPosZ + steelBaseZ/2 + shieldingZ/2;
 
     auto solidShielding = new G4Box( name, shieldingX/2.0, shieldingY/2.0, shieldingZ/2.0 );
-    auto logicShielding  = new G4LogicalVolume( solidShielding, lead, name);
-    new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,shieldPosZ), logicShielding, name, logicRoom, false, 0, fCheckOverlaps);
+    auto logicShielding = new G4LogicalVolume( solidShielding, lead, name);
+    auto physShielding  = new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,shieldPosZ), logicShielding, name, logicRoom, false, 0, fCheckOverlaps);
+
+    G4cout << GetClassName() << ": constructing " << name << " in " << physShielding->GetMotherLogical()->GetName()
+            << " at " << physShielding->GetTranslation()/cm << " cm\n"
+            << GetClassName() << ": " << name << " dimension (" << shieldingX/cm << "," << shieldingY/cm << "," << shieldingZ/cm << ") cm.\n";
+
+    logicShielding->SetVisAttributes(G4VisAttributes(G4Colour(0.2, 0.2, 0.2, 0.5)));
     
     auto logicNaIDetector = detector_assembly.GetLogicalVolume();
 
-    
     // Internal background measurements
     // Configuration is lead shielding + inner space + NaI detector assembly
     // World is as large as the 4-pi lead shielding.
@@ -386,11 +407,18 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
         G4double zOffset = 20 * cm; // thickness of lead shielding in the bottom direction
         G4double shieldingInsideZ = -shieldingZ/2 + innerShieldingZ/2 + zOffset;
     
-        auto logicShieldingInside  = new G4LogicalVolume( solidShieldingInside, air, name);
-        new G4PVPlacement( 0, G4ThreeVector(0,0,shieldingInsideZ), logicShieldingInside, name, logicShielding, false, 0, fCheckOverlaps);
+        auto logicShieldingInside = new G4LogicalVolume( solidShieldingInside, air, name);
+        auto physShieldingInside  = new G4PVPlacement( 0, G4ThreeVector(0,0,shieldingInsideZ), logicShieldingInside, name, logicShielding, false, 0, fCheckOverlaps);
+        
+        G4cout << GetClassName() << ": constructing " << name << " in " << physShielding->GetMotherLogical()->GetName()
+            << " at " << physShielding->GetTranslation()/cm << " cm\n"
+            << GetClassName() << ": " << name << " dimension (" << innerShieldingX/cm << "," << innerShieldingY/cm << "," << innerShieldingZ/cm << ") cm.\n";
+        
+        logicShieldingInside->SetVisAttributes( G4VisAttributes(G4Colour(0.8, 0.8, 0.8, 0.9)) );
 
         // place the detector assembly
         //
+        name = logicNaIDetector->GetName();
         G4double zGap = 10 * cm;
             // distance from NaI detector surface to inner lead surface in the upward direction
         G4double posZ = innerShieldingZ/2 - detector_assembly.GetLength()/2 - zGap;
@@ -399,7 +427,7 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
         rotation->rotateX(180.0 * deg);
             // in the internal background measurement, the detector is oriented upward, so apply rotation
 
-        new G4PVPlacement( rotation, G4ThreeVector(0,0,posZ), logicNaIDetector, name, logicShieldingInside, false, 0);
+        auto physNaIDetector = new G4PVPlacement( rotation, G4ThreeVector(0,0,posZ), logicNaIDetector, name, logicShieldingInside, false, 0);
     }
 
     // Bottom measurements
@@ -413,13 +441,21 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
 
         G4double shieldingInsideZ = -shieldingZ/2 + innerShieldingZ/2;
     
-        auto logicShieldingInside  = new G4LogicalVolume( solidShieldingInside, air, name);
-        new G4PVPlacement( 0, G4ThreeVector(0,0,shieldingInsideZ), logicShieldingInside, name, logicShielding, false, 0, fCheckOverlaps);
+        auto logicShieldingInside = new G4LogicalVolume( solidShieldingInside, air, name);
+        auto physShieldingInside  = new G4PVPlacement( 0, G4ThreeVector(0,0,shieldingInsideZ), logicShieldingInside, name, logicShielding, false, 0, fCheckOverlaps);
+        
+        G4cout << GetClassName() << ": constructing " << name << " in " << physShieldingInside->GetMotherLogical()->GetName()
+            << " at " << physShieldingInside->GetTranslation()/cm << " cm\n"
+            << GetClassName() << ": " << name << " dimension ("
+            << innerShieldingX/cm << "," << innerShieldingY/cm << "," << innerShieldingZ/cm << ") cm.\n";
+
+        logicShieldingInside->SetVisAttributes( G4VisAttributes(G4Colour(0.8, 0.8, 0.8, 0.9)) );
 
         // NaI detector
         //
+        name = logicNaIDetector->GetName();
         G4double detPosZ = -innerShieldingZ/2 + detector_assembly.GetLength()/2;
-        new G4PVPlacement( 0, G4ThreeVector(0,0,detPosZ), logicNaIDetector, name, logicShieldingInside, false, 0);
+        auto physNaIDetector = new G4PVPlacement( 0, G4ThreeVector(0,0,detPosZ), logicNaIDetector, name, logicShieldingInside, false, 0);
 
         // Rock on the floor
         //
@@ -431,13 +467,18 @@ G4VPhysicalVolume* GeometryConstruction::ConstructKamiokaGamma2025( int option )
 
         auto solidRock = new G4Box( name, rockX/2.0, rockY/2.0, rockZ/2.0 );
         auto logicRock = new G4LogicalVolume( solidRock, rock, name );
-        new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,rockPosZ), logicRock, name, logicWorld, false, 0, fCheckOverlaps);
+        auto physRock  = new G4PVPlacement( 0, G4ThreeVector(steelPosX,steelPosY,rockPosZ), logicRock, name, logicWorld, false, 0, fCheckOverlaps);
+        
+        G4cout << GetClassName() << ": constructing " << name << " in " << physRock->GetMotherLogical()->GetName()
+            << " at " << physRock->GetTranslation()/cm << " cm\n"
+            << GetClassName() << ": " << name << " dimension ("
+            << rockX/cm << "," << rockY/cm << "," << rockZ/cm << ") cm.\n";
+        
+        logicRock->SetVisAttributes(G4VisAttributes(G4Colour(0.3, 0.22, 0.2, 0.3)));
         
     }
 
-
-
-    logicShielding->SetVisAttributes(G4VisAttributes(G4Colour(0.2, 0.2, 0.2, 0.5)));      // Dark Gray
+    logicShielding->SetVisAttributes(G4VisAttributes(G4Colour(0.42, 0.42, 0.41, 0.5)));      // Dark Gray
 
     return physWorld;
 }

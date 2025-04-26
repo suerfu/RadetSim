@@ -140,9 +140,9 @@ G4LogicalVolume* NaIDetector::GetLogicalVolume(){
 
     logicEnclosure->SetVisAttributes(G4VisAttributes(G4Colour(0.8, 0.8, 0.8, 0.2)));
         // Light Gray
-    logicCrystal->SetVisAttributes(G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 0.8)));
+    logicCrystal->SetVisAttributes(G4VisAttributes(G4Colour(.25, .88, .82, 0.95)));
         // Blue
-    logicGlass->SetVisAttributes(G4VisAttributes(G4Colour(0.8, 0.8, 0, 0.8)));
+    logicGlass->SetVisAttributes(G4VisAttributes(G4Colour(0.9, 0.9, 0.9, 0.8)));
         // Light Gray
     logicPMT->SetVisAttributes(G4VisAttributes(G4Colour(0.3, 0.3, 0.3, 0.4)));      // Dark Gray
     //logicAssembly->SetVisAttributes(G4VisAttributes(G4Colour(0.9, 0.9, 0.9, 0.4)));     // Metallic

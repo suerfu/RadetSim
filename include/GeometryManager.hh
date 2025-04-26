@@ -14,6 +14,7 @@
 #include "globals.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "G4NistManager.hh"
+#include "G4Transform3D.hh"
 
 #include "G4Color.hh"
 
@@ -41,12 +42,14 @@ public:
 
     static GeometryManager* Get();
 
-    G4LogicalVolume* GetLogicalVolume( G4String name );
+    static G4LogicalVolume* GetLogicalVolume( G4String name );
         // return pointer to logical volume by name
 
-    G4VPhysicalVolume* GetPhysicalVolume( G4String name );
+    static G4VPhysicalVolume* GetPhysicalVolume( G4String name );
         // return pointer to physical volume by name
 
+    static G4ThreeVector GetGlobalPosition( G4VPhysicalVolume* physVol );
+    
     G4NistManager* GetMaterialManager();
 
     G4Material* GetMaterial( G4String name );

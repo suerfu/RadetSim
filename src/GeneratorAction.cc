@@ -113,6 +113,7 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     
     fVolumesInMaterial.clear();
         // clear the previous material mass information.
+    
     fCumulativeMaterialVolume = 0;
         // this variable contains the total mass of the material of concern.
 
@@ -123,6 +124,7 @@ void GeneratorAction::GPSSetMaterial( G4String materialName ){
     G4PhysicalVolumeStore *PVStore = G4PhysicalVolumeStore::GetInstance();
     
     G4int i = 0;
+
     while( i<(G4int)PVStore->size() ){
 
         G4VPhysicalVolume* pv = (*PVStore)[i];
@@ -179,6 +181,7 @@ void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
         fgun->SetParticleEnergy( SetEnergy( Energy ) );
         fgun->GeneratePrimaryVertex( anEvent );
     }
+
 	// Otherwise, if in material, get the source
 	//
     else if ( useGPS == true && GPSInMaterial == true ) {
@@ -189,7 +192,9 @@ void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
 
         G4VPhysicalVolume* selectedVolume = GPSInMaterialPickVolume( fCumulativeMaterialVolume,  fVolumesInMaterial );
 
-        G4VisExtent extent=selectedVolume->GetLogicalVolume()->GetSolid()->GetExtent();
+        G4ThreeVector selectedVolumePosition = GeometryManager::GetGlobalPosition( selectedVolume );
+
+        G4VisExtent extent = selectedVolume->GetLogicalVolume()->GetSolid()->GetExtent();
 
         G4ThreeVector translationToVolumeCenter( (extent.GetXmax()+extent.GetXmin())/2., (extent.GetYmax()+extent.GetYmin())/2., (extent.GetZmax()+extent.GetZmin())/2. );
 
@@ -197,17 +202,29 @@ void GeneratorAction::GeneratePrimaries( G4Event* anEvent ){
         pd->ConfineSourceToVolume( selectedVolume->GetName() );
         pd->SetPosDisType( "Volume" );
         pd->SetPosDisShape( "Para" );
-        pd->SetCentreCoords( selectedVolume->GetTranslation() + translationToVolumeCenter );
+        pd->SetCentreCoords( selectedVolumePosition + translationToVolumeCenter );
         pd->SetHalfX( (extent.GetXmax()-extent.GetXmin()) / 2. );
         pd->SetHalfY( (extent.GetYmax()-extent.GetYmin()) / 2. );
         pd->SetHalfZ( (extent.GetZmax()-extent.GetZmin()) / 2. );
 
+        /*
+        G4cout << "GPSInMaterial confined to volume " << selectedVolume->GetName() << G4endl;
+        G4cout << selectedVolumePosition << "\t trans. to vol center : " << translationToVolumeCenter << G4endl;
+        G4cout << "extent is " << (extent.GetXmax()-extent.GetXmin()) / 2. << ' ' 
+            << (extent.GetYmax()-extent.GetYmin()) / 2. << ' ' 
+            << (extent.GetZmax()-extent.GetZmin()) / 2. << G4endl;
+        */
+
         fgps->GeneratePrimaryVertex( anEvent );
     }
+
 	// in this case, user will be setting everything from macros.
 	//
     else{
         fgps->GeneratePrimaryVertex( anEvent );
     }
+
 }
+
+
 

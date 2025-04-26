@@ -49,15 +49,50 @@ G4VPhysicalVolume* GeometryManager::GetPhysicalVolume( G4String name ){
 }
 
 
-/*
-G4double  GeometryManager::GetDimensions(G4String name){
-	if( dimensions.find(name)==dimensions.end() ){
-		return 0;
-	}else{
-		return dimensions[name];
-	}
+G4ThreeVector GeometryManager::GetGlobalPosition( G4VPhysicalVolume* pv) {
+
+    /*
+    const G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
+    G4cout << "Tracing up the location of " << pv->GetName() << "\nTotal number of physical volumes: " << store->size() << std::endl; 
+
+    for (const auto* volume : *store) {
+        std::cout << "Name: " << volume->GetName()
+                  << ", Copy No: " << volume->GetCopyNo()
+                  << ", Translation: " << volume->GetTranslation()/cm << " cm"
+                  << std::endl;
+    }
+    */
+
+    G4ThreeVector position = pv->GetTranslation();
+    //G4cout << pv->GetName() << " translation is " << position << G4endl;
+
+    //G4RotationMatrix rotation = *(pv->GetRotation()); // Copy rotation matrix if exists
+    // at the moment do not consiter rotation...
+
+    G4VPhysicalVolume* mother = GetPhysicalVolume( pv->GetMotherLogical()->GetName() );
+
+    while ( mother != nullptr ) {
+
+        //G4cout << "Parent volume is " << mother->GetName() << " at " << mother->GetTranslation() << G4endl;
+
+        if (mother->GetRotation()) {
+            position = *(mother->GetRotation()) * position;
+        }
+
+        position += mother->GetTranslation();
+
+        mother = GetPhysicalVolume( mother->GetMotherLogical()->GetName() );
+            // Note: it assumes logical volumes are unique
+            // Maybe in the future, also consider the copy number?
+
+        if ( mother->GetName() == "World" ){
+            break;
+        }
+    }
+
+    return position;
 }
-*/
+
 
 
 G4NistManager* GeometryManager::GetMaterialManager(){

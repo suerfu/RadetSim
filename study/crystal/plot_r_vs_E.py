@@ -124,5 +124,5 @@ axs[1].minorticks_on()
 axs[1].grid(True)
 plt.colorbar(im2, ax=axs[1])
 
-plt.suptitle("Tantalum", fontsize=16)
+plt.suptitle("Selenium", fontsize=16)
 plt.show()

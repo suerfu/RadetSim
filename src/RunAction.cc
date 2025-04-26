@@ -53,7 +53,7 @@ RunAction::RunAction( CommandlineArguments* c) : G4UserRunAction(), fRunActionMe
     randomSeeds.push_back( seeds[0] );
     randomSeeds.push_back( seeds[1] );
 
-    G4cout << "Seeds for random generator are " << seeds[0] << ", " << seeds[1] << G4endl;
+    G4cout << GetClassName() << "Seeds for random generator are " << seeds[0] << ", " << seeds[1] << G4endl;
 
     // Configure output
     //

@@ -34,8 +34,8 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
 
     // If global time is within the window, return urgent regardless of the process:
     //
-    G4double window = 60*CLHEP::s;
-        // 1-minute window
+    G4double window = 1*CLHEP::ms;
+        // 1-ms window
 
     G4double time = track->GetGlobalTime();
     if( time < window ){
@@ -48,6 +48,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
     if( track->GetCreatorProcess()!=0 ){
         motherProcess = track->GetCreatorProcess()->GetProcessName();
     }
+
     //G4cout << "Name: " << track->GetParticleDefinition()->GetParticleName() << "\tt: " << track->GetGlobalTime() << "\tCreatorProc: " << motherProcess << G4endl;
 
     if( motherProcess.find("RadioactiveDecay")==std::string::npos ){
@@ -62,10 +63,7 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track* track
 
 
 void StackingAction::NewStage(){
-//    if( stackManager->GetNWaitingTrack()>0 ){
     StepInfo stepinfo;
     stepinfo.SetProcessName( "timeReset" );
     fEventAction->GetStepCollection().push_back(stepinfo);
-//    }
-
 }

@@ -107,7 +107,7 @@ void EventAction::EndOfEventAction(const G4Event* event){
     G4int evtID = event->GetEventID();
     G4int printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
     if ( ( printModulo > 0 ) && ( evtID % printModulo == 0 ) ) {
-        G4cout << "---> End of event: " << evtID << G4endl;
+        G4cout << "--> End of event: " << evtID << G4endl;
     }
 
     if( data_tree!=0 ){

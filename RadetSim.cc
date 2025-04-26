@@ -1,9 +1,9 @@
 /*
     Author:  Suerfu Burkhant
-    Date:    November 18, 2021
-    Contact: suerfu@berkeley.edu
+    Date:    April 26, 2025
+    Contact: suerfu@post.kek.jp
 */
-/// \file DetectorTemplate.cc
+/// \file Radet.cc
 /// \brief Main template for Geant4 detector simulation.
 /// It provides the framework for 
 /// 1) defining and/or adding geometries
@@ -37,6 +37,8 @@
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
+
+#include "G4HadronicParameters.hh"
 
 #include <string>
 
@@ -100,6 +102,10 @@ int main( int argc, char** argv ){
     //
     G4cout << GetClassName() << ": Constructing Shielding PhysicsList..." << G4endl;
     G4VModularPhysicsList* physicsList = new Shielding;
+    G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay( 1.0e+60*CLHEP::year );
+        // Note: since 11.2. radioactive decay of very long half lives have been disabled
+        // This needs to be turned on manually in C++ code or through macro by the following command
+        // /process/had/rdm/thresholdForVeryLongDecayTime 1.0e+60 year
 
 /*
     // Configure geometry importance biasing
@@ -110,6 +116,7 @@ int main( int argc, char** argv ){
     G4GeometrySampler geom_sampler_ep(detectorConstruction->GetWorldPhysical(),"e+");
     physicsList->RegisterPhysics( new G4ImportanceBiasing(&geom_sampler_ep) );
 */
+
     // Note below line has to be after setting up biasing.
     G4cout << GetClassName() << ": Setting PhysicsList User Initialization..." << G4endl;
     runManager->SetUserInitialization( physicsList );

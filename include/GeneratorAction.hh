@@ -57,7 +57,7 @@ public:
     
     void GPSSetMaterial( G4String materialName );
         // this function samples particle position based on material instead of volume.
-    
+
 private:
 
     GeneratorMessenger* primaryGeneratorMessenger;
@@ -89,7 +89,7 @@ private:
         // this is updated each time the function is invoked.
 
     G4String particle;
-		// name of particle being simulated.
+        // name of particle being simulated.
 
     TFile* file;
         // Pointer to the ROOT file containing 2D histogram.
@@ -101,7 +101,7 @@ private:
         // Energy
 
     G4double Theta;
-		// polar angle w.r.t. a surface
+        // polar angle w.r.t. a surface
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

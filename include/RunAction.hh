@@ -69,6 +69,7 @@ public:
     void AddKillWhenHit( G4String a);
     bool KillWhenHit( G4String a);
 
+    G4String GetClassName(){ return "RunAction"; }
 
 private:
     
